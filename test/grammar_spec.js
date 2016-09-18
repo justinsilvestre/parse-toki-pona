@@ -6,7 +6,18 @@ import { transform } from 'babel-core'
 
 const grammarText = fs.readFileSync(path.join(__dirname, '..', 'tokipona.pegjs'), 'utf8')
 const parser = eval(transform(peg.generate(grammarText, {output: 'source'}), { plugins: ["transform-object-rest-spread"] }).code)
-const parse = (text) => parser.parse(text)[0]
+const parse = (text) => {
+  const data = parser.parse(text)[0]
+
+  const reconstructed = data.map(v =>
+    typeof v === 'string' ? v : (v.word || v.text)
+  ).filter(v=>v).join(' ')
+  if (reconstructed !== text)
+    throw new Error('A word is missing here!'
+      + `Compare "${reconstructed}" to "${text}"`)
+
+  return data
+}
 
 function wordsFrom(parsedSentence) {
   return parsedSentence.map(({ word }) => word)
@@ -76,6 +87,12 @@ describe('parser', () => {
     })
   })
 
+  it('parses a compound subject', () => {
+    const [toki, en, pali] = parse('mi en sina li pona')
+
+    expect([toki, pali].map(w => w.role)).toEqual(['subject', 'subject'])
+  })
+
   it('parses a microsubject', () => {
     const [mi, pona] = parse('mi pona')
 
@@ -112,7 +129,6 @@ describe('parser', () => {
   it('parses direct object', () => {
     const [mi, moku, e, pan] = parse('mi moku e pan')
 
-    console.log(parse('mi moku e pan'))
     expect(pan).toInclude({
       role: 'direct_object'
     })

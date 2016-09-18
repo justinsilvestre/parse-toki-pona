@@ -25,29 +25,32 @@ Sentences
   = s:Sentence+ { return s }
 
 Sentence
-  = cs:Context* _ c:Clause _ ep:EndPunctuation { return [...flatten(cs), ...c, endPunctuation(ep)] }
+  = cs:Context* c:Clause ep:EndPunctuation { return [...flatten(cs), ...c, endPunctuation(ep)] }
 
 Context
-  = c:Clause _ 'la' { return context(c) }
+  = c:Clause 'la' { return [...context(c), 'la'] }
 
 Clause
-  = sp:SubjectAndParticle  _ p:Predicate { return [...sp, ...p] }
-  / ms:MS _ p:Predicate { return [...subject([word(ms)]), ...p] }
+  = sp:SubjectAndParticle p:Predicate { return [...sp, ...p] }
+  / ms:MS p:Predicate { return [...subject([word(ms)]), ...p] }
   / p:Predicate { return [...p] }
 
-Predicate
-  = p:Phrase dos:DirectObject* { return [...predicate(p), ...flatten(dos.map(directObject)) ]}
-
-EndPunctuation
-  = [\.\?\!]+ { return text() }
-  / ! { return '' }
-
 SubjectAndParticle
-  = s:Phrase _ mp:ModalParticle { return [...subject(s), mp] }
+  = s:Phrase ass:AdditionalSubject* mp:ModalParticle { return [...subject(s), ...flatten(ass), mp] }
+
+AdditionalSubject
+  = 'en' s:Phrase { return ['en', ...subject(s)] }
 
 ModalParticle
   = 'li'
   / 'o'
+
+Predicate
+  = p:Phrase dos:DirectObject* { return [...predicate(p), ...flatten(dos) ]}
+
+EndPunctuation
+  = [\.\?\!]+ { return text() }
+  / ! { return '' }
 
 DirectObject
   = 'e' p:Phrase { return ['e', ...directObject(p)] }
@@ -60,21 +63,21 @@ SimplePhrase
   = word:Substantive { return [word]  }
 
 ComplexPhrase
-  = ss:SubstantiveString _ cc:ComplexComplement+ {
+  = ss:SubstantiveString cc:ComplexComplement+ {
     return [...ss,
     ...flatten(cc.map(([pi, subHead, ...rest]) => [pi, { ...subHead, head: ss[0].id }, ...rest]))
     ] }
 
 ComplexComplement
-  = _ 'pi' _ ss:SubstantiveString _ { return ['pi', ...ss]}
+  = 'pi' ss:SubstantiveString { return ['pi', ...ss]}
 
 SubstantiveString
   = s:Substantive+ { const [head, ...rest] = s; return [head, ...rest.map(complements(head))] }
 
 Substantive
-  = _ cs:CS _ { return word(cs) }
-  / _ ms:MS _ { return word(ms)}
+  = _ ms:MS _ { return word(ms)}
   / _ pv:PV _ { return word(pv)}
+  / _ cs:CS _ { return word(cs) }
 
 CS "common substantive"
   = 'sitelen'/'kepeken'/'kalama'/'soweli'/'pimeja'/'kulupu'/'sijelo'/'sinpin'
@@ -87,7 +90,7 @@ CS "common substantive"
   /'kala'/'lupa'/'unpa'/'luka'/'anpa'/'loje'/'lipu'/'jelo'/'lili'/'lete'/'weka'
   /'lawa'/'laso'/'lape'/'jaki'/'kute'/'walo'/'kon'/'ali'/'pan'/'tan'/'ona'/'oko'
   /'jan'/'mun'/'ilo'/'ike'/'ijo'/'ale'/'lon'/'uta'/'len'/'sin'/'ala'/'anu'/'wan'
-  /'kin'/'ma'/'ni'/'mu'/'tu'/'pu'/'ko'/'jo'/'en'/'a'
+  /'kin'/'ma'/'ni'/'mu'/'tu'/'pu'/'ko'/'jo'/'a'
 
 MS "microsubject"
   = 'mi'/'sina'
