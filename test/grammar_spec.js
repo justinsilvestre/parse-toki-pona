@@ -37,11 +37,27 @@ describe('parser', () => {
     })
   })
 
+  it('parses a phrase with single complements', () => {
+    const [toki, pona, lili] = parse('toki pona lili')
+
+    expect(lili).toInclude({
+      role: 'complement',
+      head: toki.id,
+    })
+  })
+
   it('parses a phrase with single complex complement', () => {
     const [toki, pi, pona, mute] = parse('toki pi pona mute')
 
     expect(pona.head).toBe(toki.id)
     expect(mute.head).toBe(pona.id)
+  })
+
+  it('parses a phrase with complex complements', () => {
+    const parsed = parse('toki pona pi lili mute pi sona sewi')
+    const [toki, pona, , lili, mute, , sona, sewi] = parsed
+
+    expect([pona, lili, sona].map(w => w.head)).toEqual([toki.id, toki.id, toki.id])
   })
 
   it('parses a simple predicate', () => {
@@ -82,6 +98,23 @@ describe('parser', () => {
     expect(mute).toInclude({
       role: 'complement',
       head: mi.id
+    })
+  })
+
+  it('parses a sentence with context', () => {
+    const [ken, la, sina, pona] = parse('ken la sina pona')
+
+    expect(ken).toInclude({
+      role: 'context_predicate'
+    })
+  })
+
+  it('parses direct object', () => {
+    const [mi, moku, e, pan] = parse('mi moku e pan')
+
+    console.log(parse('mi moku e pan'))
+    expect(pan).toInclude({
+      role: 'direct_object'
     })
   })
 })

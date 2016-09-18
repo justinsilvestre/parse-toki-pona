@@ -1,5 +1,6 @@
 {
   const { v4 } = require('uuid')
+  const flatten = (arrs) => arrs.reduce((a, b) => a.concat(b), [])
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ word: text, id: v4()})
@@ -7,15 +8,35 @@
   const predicate = ([head, ...rest]) => [{ ...head, role: 'predicate' }, ...rest]
   const subject = ([head, ...rest]) => [{ ...head, role: 'subject' }, ...rest]
   const endPunctuation = (text) => ({ role: 'end_punctuation', text })
+  const context = (clause) => clause.map(w => {
+    if (!w.role)
+      return w
+
+    return (w.role === 'subject' || w.role === 'predicate')
+      ? { ...w, role: `context_${w.role}` }
+      : w
+  })
+  const directObject = ([head, ...rest]) => [{ ...head, role: 'direct_object' }, ...rest]
 }
+
+/* TODO: ACCOMODATE COMMAS */
 
 Sentences
   = s:Sentence+ { return s }
 
 Sentence
-  = sp:SubjectAndParticle  _ p:Phrase _ ep:EndPunctuation { return [...sp, ...predicate(p), endPunctuation(ep)] }
-  / ms:MS _ p:Phrase _ ep:EndPunctuation { return [...subject([word(ms)]), ...predicate(p), endPunctuation(ep)] }
-  / p:Phrase _ ep:EndPunctuation { return [...predicate(p), endPunctuation(ep)] }
+  = cs:Context* _ c:Clause _ ep:EndPunctuation { return [...flatten(cs), ...c, endPunctuation(ep)] }
+
+Context
+  = c:Clause _ 'la' { return context(c) }
+
+Clause
+  = sp:SubjectAndParticle  _ p:Predicate { return [...sp, ...p] }
+  / ms:MS _ p:Predicate { return [...subject([word(ms)]), ...p] }
+  / p:Predicate { return [...p] }
+
+Predicate
+  = p:Phrase dos:DirectObject* { return [...predicate(p), ...flatten(dos.map(directObject)) ]}
 
 EndPunctuation
   = [\.\?\!]+ { return text() }
@@ -28,39 +49,51 @@ ModalParticle
   = 'li'
   / 'o'
 
+DirectObject
+  = 'e' p:Phrase { return ['e', ...directObject(p)] }
+
 Phrase
   = phrase:ComplexPhrase { return phrase }
-  / phrase:SimplePhrase { return phrase }
+  / phrase:SubstantiveString { return phrase }
 
 SimplePhrase
   = word:Substantive { return [word]  }
 
 ComplexPhrase
-  = word:Substantive _ complement:Complement { return [word, ...complement.map(complements(word))]  }
+  = ss:SubstantiveString _ cc:ComplexComplement+ {
+    return [...ss,
+    ...flatten(cc.map(([pi, subHead, ...rest]) => [pi, { ...subHead, head: ss[0].id }, ...rest]))
+    ] }
 
-Complement
-  = 'pi' _ phrase:Phrase { return ['pi', ...phrase] }
-  / head:Substantive { return [head] }
+ComplexComplement
+  = _ 'pi' _ ss:SubstantiveString _ { return ['pi', ...ss]}
+
+SubstantiveString
+  = s:Substantive+ { const [head, ...rest] = s; return [head, ...rest.map(complements(head))] }
 
 Substantive
-  = cs:CS { return word(cs) }
-  / ms:MS { return word(ms)}
+  = _ cs:CS _ { return word(cs) }
+  / _ ms:MS _ { return word(ms)}
+  / _ pv:PV _ { return word(pv)}
 
 CS "common substantive"
   = 'sitelen'/'kepeken'/'kalama'/'soweli'/'pimeja'/'kulupu'/'sijelo'/'sinpin'
-  /'pakala'/'palisa'/'namako'/'monsi'/'kiwen'/'utala'/'linja'/'lukin'/'pilin'
-  /'akesi'/'tenpo'/'nanpa'/'nasin'/'alasa'/'musi'/'sona'/'suli'/'kule'
+  /'pakala'/'palisa'/'namako'/'monsi'/'kiwen'/'utala'/'linja'/'pilin'
+  /'akesi'/'tenpo'/'nanpa'/'nasin'/'alasa'/'musi'/'suli'/'kule'
   /'sike'/'suno'/'sewi'/'seme'/'selo'/'seli'/'sama'/'insa'/'pona'/'poki'/'poka'
-  /'pipi'/'pini'/'supa'/'suwi'/'pana'/'awen'/'wile'/'pali'/'taso'/'open'/'ante'
+  /'pipi'/'pini'/'supa'/'suwi'/'pana'/'wile'/'pali'/'taso'/'open'/'ante'
   /'olin'/'kili'/'noka'/'nimi'/'waso'/'nena'/'tawa'/'nasa'/'telo'/'toki'/'mute'
-  /'tomo'/'esun'/'kasi'/'kama'/'moli'/'moku'/'mije'/'wawa'/'meli'/'mani'/'mama'
+  /'tomo'/'esun'/'kasi'/'moli'/'moku'/'mije'/'wawa'/'meli'/'mani'/'mama'
   /'kala'/'lupa'/'unpa'/'luka'/'anpa'/'loje'/'lipu'/'jelo'/'lili'/'lete'/'weka'
   /'lawa'/'laso'/'lape'/'jaki'/'kute'/'walo'/'kon'/'ali'/'pan'/'tan'/'ona'/'oko'
   /'jan'/'mun'/'ilo'/'ike'/'ijo'/'ale'/'lon'/'uta'/'len'/'sin'/'ala'/'anu'/'wan'
-  /'kin'/'ken'/'ma'/'ni'/'mu'/'tu'/'pu'/'la'/'ko'/'jo'/'en'/'e'/'a'
+  /'kin'/'ma'/'ni'/'mu'/'tu'/'pu'/'ko'/'jo'/'en'/'a'
 
 MS "microsubject"
   = 'mi'/'sina'
+
+PV "pre-verb"
+  = 'awen'/'kama'/'ken'/'lukin'/'sona'
 
 _ "whitespace"
   = [ \t\n\r]*
