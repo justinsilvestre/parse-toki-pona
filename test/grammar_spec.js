@@ -19,13 +19,7 @@ const parse = (text) => {
   return data
 }
 
-function wordsFrom(parsedSentence) {
-  return parsedSentence.map(({ word }) => word)
-}
-
-function idAt(wordIndex, [parsedSentence]) {
-  return parsedSentence[wordIndex].id
-}
+const getRole = (word) => word.role
 
 describe('parser', () => {
   it('parses a simple sentence', () => {
@@ -90,7 +84,7 @@ describe('parser', () => {
   it('parses a compound subject', () => {
     const [toki, en, pali] = parse('mi en sina li pona')
 
-    expect([toki, pali].map(w => w.role)).toEqual(['subject', 'subject'])
+    expect([toki, pali].map(getRole)).toEqual(['subject', 'subject'])
   })
 
   it('parses a microsubject', () => {
@@ -132,5 +126,35 @@ describe('parser', () => {
     expect(pan).toInclude({
       role: 'direct_object'
     })
+  })
+
+  it('parses a preverb with infinitive', () => {
+    const [sina, ken, pona] = parse('sina ken pona')
+
+    expect([ken, pona].map(getRole)).toEqual(['predicate', 'infinitive'])
+  })
+
+  it('parses a prepositional predicate', () => {
+    const [sina, lon, sewi] = parse('sina lon sewi')
+
+    expect([lon, sewi].map(getRole)).toEqual(['predicate', 'prepositional_object'])
+  })
+
+  it('parses a preposition as transitive verb in presence of direct object', () => {
+    const [mi, tawa, wawa, e, kiwen] = parse('mi tawa wawa e kiwen')
+
+    expect([tawa, wawa].map(getRole)).toEqual(['predicate', 'complement'])
+  })
+
+  it('parses compound predicates', () => {
+    const [toki, , pona, , wawa] = parse('toki li pona li wawa')
+
+    expect([pona, wawa].map(getRole)).toEqual(['predicate', 'predicate'])
+  })
+
+  it('parses a subjectless optative predicate', () => {
+    const [o, pona] = parse('o pona')
+
+    expect([o, pona].map(getRole)).toEqual([undefined, 'predicate'])
   })
 })
