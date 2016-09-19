@@ -12,9 +12,11 @@ const parse = (text) => {
   const reconstructed = data.map(v =>
     typeof v === 'string' ? v : (v.word || v.text)
   ).filter(v=>v).join(' ')
-  if (reconstructed !== text)
-    throw new Error('A word is missing here!'
+  if (reconstructed !== text) {
+    console.log(data)
+    throw new Error('A word is missing here! '
       + `Compare "${reconstructed}" to "${text}"`)
+  }
 
   return data
 }
@@ -146,6 +148,8 @@ describe('parser', () => {
     expect([tawa, wawa].map(getRole)).toEqual(['predicate', 'complement'])
   })
 
+  it('parses a prepositional phrase outside of predicate head')
+
   it('parses compound predicates', () => {
     const [toki, , pona, , wawa] = parse('toki li pona li wawa')
 
@@ -157,4 +161,53 @@ describe('parser', () => {
 
     expect([o, pona].map(getRole)).toEqual([undefined, 'predicate'])
   })
+
+  it('parses a vocative expression in an indicative sentence', () => {
+    const [jan, mute, o, ale, li, pona] = parse('jan mute o, ale li pona')
+
+    expect(jan).toInclude({
+      role: 'vocative'
+    })
+  })
+
+  it('parses a lone vocative expression as sentence', () => {
+    const [sewi, o] = parse('sewi o!')
+
+    expect(sewi).toInclude({
+      role: 'vocative'
+    })
+  })
+
+  it('parses questions with anu seme')
+
+  it('parses questions with ala', () => {
+    const [sina, pona1, ala, pona2] = parse('sina pona ala pona')
+
+    expect([ala, pona2].map(getRole)).toEqual(['interrogative', 'interrogative'])
+    expect(pona2).toInclude({ word: 'pona' })
+  })
+
+  it('parses negation', () => {
+    const [ni, li, pona, ala, a] = parse('ni li pona ala a')
+
+    expect(ala).toInclude({
+      role: 'negative',
+      head: pona.id
+    })
+  })
+
+  it('parses negated preposition', () => {
+    const [ike, li, lon, ala] = parse('ike li lon ala')
+
+    expect(ala).toInclude({
+      role: 'negative',
+      head: lon.id
+    })
+  })
+
+  it('parses negated pre-verb')
+
+  it('parses anu phrases')
+
+  it('parses proper nouns')
 })

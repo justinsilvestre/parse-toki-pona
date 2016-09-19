@@ -4,7 +4,8 @@
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ word: text, id: v4()})
-  const complements = (head) => (c) => ({ ...c, role: 'complement', head: c.head || head.id })
+  const complements = (head) => (c) => ({ ...c, role: c.role || 'complement', head: c.head || head.id })
+  const vocative = ([head, ...rest]) => [{ ...head, role: 'vocative' }, ...rest]
   const predicate = ([head, ...rest]) => [{ ...head, role: 'predicate' }, ...rest]
   const subject = ([head, ...rest]) => [{ ...head, role: 'subject' }, ...rest]
   const endPunctuation = (text = '') => ({ role: 'end_punctuation', text })
@@ -19,6 +20,8 @@
   const infinitive = ([head, ...restOfVerbalPhrase]) => [{ ...head, role: 'infinitive' }, ...restOfVerbalPhrase]
   const directObject = ([head, ...rest]) => [{ ...head, role: 'direct_object' }, ...rest]
   const prepositionalObject = ([head, ...rest]) => [{ ...head, role: 'prepositional_object' }, ...rest]
+  const negative = (ala) => ala ? [{ word: 'ala', role: 'negative' }] : []
+  const interrogative = (s) => [{ word: 'ala', role: 'interrogative' }, { word: s.word, role: 'interrogative' }]
 }
 
 /* TODO: ACCOMODATE COMMAS */
@@ -27,7 +30,12 @@ Sentences
   = s:Sentence+ { return s }
 
 Sentence
-  = cs:Context* c:Clause ep:EndPunctuation { return [...flatten(cs), ...c, endPunctuation(ep)] }
+  = v:Vocative? cs:Context* c:Clause ep:EndPunctuation
+    { return [...(v || []), ...flatten(cs), ...c, endPunctuation(ep)] }
+  / v:Vocative ep:EndPunctuation { return [...v, endPunctuation(ep)] }
+
+Vocative
+  = p:Phrase 'o' _ pu:[\,\!] { return [...vocative(p), 'o' + pu] }
 
 Context
   = c:Clause 'la' { return [...context(c), 'la'] }
@@ -54,7 +62,7 @@ OptativeParticle
 
 Predicate
   = vp:VerbalPhrase dos:DirectObject+ { return [...vp, ...flatten(dos) ]}
-  / _ prep:PREP p:Phrase { return [...predicate([word(prep)]), ...prepositionalObject(p)] }
+  / prep:PrepositionWithPolarity p:Phrase { return [...predicate(prep), ...prepositionalObject(p)] }
   / vp:VerbalPhrase { return vp }
 
 AdditionalPredicate
@@ -75,9 +83,6 @@ Phrase
   = phrase:ComplexPhrase { return phrase }
   / phrase:SubstantiveString { return phrase }
 
-SimplePhrase
-  = word:Substantive { return [word]  }
-
 ComplexPhrase
   = ss:SubstantiveString cc:ComplexComplement+ {
     return [...ss,
@@ -88,7 +93,17 @@ ComplexComplement
   = 'pi' ss:SubstantiveString { return ['pi', ...ss]}
 
 SubstantiveString
-  = s:Substantive+ { const [head, ...rest] = s; return [head, ...rest.map(complements(head))] }
+= s:SubstantiveWithPolarity+ { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }
+
+SubstantiveWithPolarity
+  = s1:Substantive ala:Ala s2:Substantive & { return s1.word === s2.word } { return [s1, ...interrogative(s1)] }
+  / s:Substantive ala:Ala? { return [s, ...negative(ala)]}
+
+  /*PreVerbWithPolarity
+    = _ pv:PV _ ala:Ala? { const neg = ala ? [word('ala')] : []; return [pv, ...neg]}*/
+
+PrepositionWithPolarity
+  = _ prep:PREP _ ala:Ala? { return [word(prep), ...negative(ala)] }
 
 Substantive
   = _ ms:MS _ { return word(ms)}
@@ -106,7 +121,7 @@ CS "common substantive"
   /'tomo'/'esun'/'kasi'/'moli'/'moku'/'mije'/'wawa'/'meli'/'mani'/'mama'
   /'kala'/'lupa'/'unpa'/'luka'/'anpa'/'loje'/'lipu'/'jelo'/'lili'/'lete'/'weka'
   /'lawa'/'laso'/'lape'/'jaki'/'kute'/'walo'/'kon'/'ali'/'pan'/'ona'/'oko'
-  /'jan'/'mun'/'ilo'/'ike'/'ijo'/'ale'/'uta'/'len'/'sin'/'ala'/'anu'/'wan'
+  /'jan'/'mun'/'ilo'/'ike'/'ijo'/'ale'/'uta'/'len'/'sin'/'anu'/'wan'
   /'kin'/'ma'/'ni'/'mu'/'tu'/'pu'/'ko'/'jo'/'a'
 
 MS "microsubject"
@@ -117,6 +132,9 @@ PV "pre-verb"
 
 PREP "preposition"
   = 'kepeken'/'lon'/'sama'/'tan'/'tawa'
+
+Ala
+  = 'ala'
 
 _ "whitespace"
   = [ \t\n\r]*
