@@ -1,6 +1,8 @@
 {
   const { v4 } = require('uuid')
   const flatten = (arrs) => arrs.reduce((a, b) => a.concat(b), [])
+  const last = (arr) => arr[arr.length && arr.length - 1]
+  const init = (arr) => arr.slice(0, arr.length && arr.length - 1)
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ word: text, id: v4()})
@@ -9,6 +11,12 @@
   const predicate = ([head, ...rest]) => [{ ...head, role: 'predicate' }, ...rest]
   const subject = ([head, ...rest]) => [{ ...head, role: 'subject' }, ...rest]
   const endPunctuation = (text = '') => ({ role: 'end_punctuation', text })
+  const punctuate = ({ before, after }, word) => ({
+    ...(before ? { before } : {}),
+    ...(after ? { after } : {}),
+    ...word
+  })
+  const punctuateLast = (after, phrase) => [...init(phrase), punctuate({ after }, last(phrase))]
   const context = (clause) => clause.map(w => {
     if (!w.role)
       return w
@@ -22,20 +30,22 @@
   const prepositionalObject = ([head, ...rest]) => [{ ...head, role: 'prepositional_object' }, ...rest]
   const negative = (ala) => ala ? [{ word: 'ala', role: 'negative' }] : []
   const interrogative = (s) => [{ word: 'ala', role: 'interrogative' }, { word: s.word, role: 'interrogative' }]
+
+  const vocativeParticle = { text: 'o', role: 'vocative_particle' }
 }
 
-/* TODO: ACCOMODATE COMMAS */
+/* TODO: ACCOMMODATE COMMAS */
 
 Sentences
   = s:Sentence+ { return s }
 
 Sentence
   = v:Vocative? cs:Context* c:Clause ep:EndPunctuation
-    { return [...(v || []), ...flatten(cs), ...c, endPunctuation(ep)] }
-  / v:Vocative ep:EndPunctuation { return [...v, endPunctuation(ep)] }
+    { return [...(v || []), ...flatten(cs), ...punctuateLast(ep, c)] }
+  / v:Vocative ep:EndPunctuation { return [...punctuateLast(ep, v)] }
 
 Vocative
-  = p:Phrase 'o' _ pu:[\,\!] { return [...vocative(p), 'o' + pu] }
+  = p:Phrase 'o' _ pu:[\,\!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
 
 Context
   = c:Clause 'la' { return [...context(c), 'la'] }
@@ -69,7 +79,7 @@ AdditionalPredicate
   = mp:ModalParticle p:Predicate { return [mp, ...p] }
 
 VerbalPhrase
-  = _ pv:PV vp:VerbalPhrase { return [...predicate([word(pv)]), ...infinitive(vp)] }
+  = pv:PreVerbWithPolarity vp:VerbalPhrase { return [...predicate(pv), ...infinitive(vp)] }
   / p:Phrase { return predicate(p) }
 
 EndPunctuation
@@ -99,17 +109,15 @@ SubstantiveWithPolarity
   = s1:Substantive ala:Ala s2:Substantive & { return s1.word === s2.word } { return [s1, ...interrogative(s1)] }
   / s:Substantive ala:Ala? { return [s, ...negative(ala)]}
 
-  /*PreVerbWithPolarity
-    = _ pv:PV _ ala:Ala? { const neg = ala ? [word('ala')] : []; return [pv, ...neg]}*/
+PreVerbWithPolarity
+  = _ pv1:PV ala:Ala pv2:PV _ & { return pv1 === pv2 } { return [word(pv1), ...interrogative(pv2)] }
+  / _ pv:PV ala:Ala? { return [word(pv), ...negative(ala)]}
 
 PrepositionWithPolarity
-  = _ prep:PREP _ ala:Ala? { return [word(prep), ...negative(ala)] }
+  = _ prep:PREP ala:Ala? { return [word(prep), ...negative(ala)] }
 
 Substantive
-  = _ ms:MS _ { return word(ms)}
-  / _ pv:PV _ { return word(pv)}
-  / _ prep:PREP _ { return word(prep) }
-  / _ cs:CS _ { return word(cs) }
+  = _ s:(MS / PV / PREP / CS) _ { return word(s) }
 
 CS "common substantive"
   = 'sitelen'/'kalama'/'soweli'/'pimeja'/'kulupu'/'sijelo'/'sinpin'
@@ -134,7 +142,7 @@ PREP "preposition"
   = 'kepeken'/'lon'/'sama'/'tan'/'tawa'
 
 Ala
-  = 'ala'
+  = _ ala:'ala' _ { return ala }
 
 _ "whitespace"
   = [ \t\n\r]*

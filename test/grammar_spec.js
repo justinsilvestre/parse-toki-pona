@@ -10,7 +10,9 @@ const parse = (text) => {
   const data = parser.parse(text)[0]
 
   const reconstructed = data.map(v =>
-    typeof v === 'string' ? v : (v.word || v.text)
+    typeof v === 'string'
+      ? v
+      : ((v.before || '') + (v.word || v.text) + (v.after || ''))
   ).filter(v=>v).join(' ')
   if (reconstructed !== text) {
     console.log(data)
@@ -130,7 +132,7 @@ describe('parser', () => {
     })
   })
 
-  it('parses a preverb with infinitive', () => {
+  it('parses a pre-verb with infinitive', () => {
     const [sina, ken, pona] = parse('sina ken pona')
 
     expect([ken, pona].map(getRole)).toEqual(['predicate', 'infinitive'])
@@ -205,7 +207,11 @@ describe('parser', () => {
     })
   })
 
-  it('parses negated pre-verb')
+  it('parses negated pre-verb', () => {
+    const [ijo, li, ken, ala, awen] = parse('ijo li ken ala awen')
+
+    expect([ken, ala, awen].map(getRole)).toEqual(['predicate', 'negative', 'infinitive'])
+  })
 
   it('parses anu phrases')
 
