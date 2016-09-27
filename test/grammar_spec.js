@@ -12,7 +12,7 @@ const parse = (text) => {
   const reconstructed = data.map(v =>
     typeof v === 'string'
       ? v
-      : ((v.before || '') + (v.word || v.text) + (v.after || ''))
+      : [v.before, v.text, v.after].filter(v=>v).join('')
   ).filter(v=>v).join(' ')
   if (reconstructed !== text) {
     console.log(data)
@@ -30,7 +30,7 @@ describe('parser', () => {
     const [toki] = parse('toki')
 
     expect(toki).toInclude({
-      word: 'toki',
+      text: 'toki',
       role: 'predicate'
     })
     expect(toki.id).toExist()
@@ -40,7 +40,7 @@ describe('parser', () => {
     const [toki, pona] = parse('toki pona')
 
     expect(pona).toInclude({
-      word: 'pona',
+      text: 'pona',
       role: 'complement',
       head: toki.id,
     })
@@ -144,13 +144,31 @@ describe('parser', () => {
     expect([lon, sewi].map(getRole)).toEqual(['predicate', 'prepositional_object'])
   })
 
+  it('parses a prepositional complement with pi', () => {
+    const [jan, pi, lon, tomo, li, wawa] = parse('jan pi lon tomo li wawa')
+
+    expect(lon).toInclude({
+      role: 'complement',
+      head: jan.id
+    })
+    expect(tomo).toInclude({ role: 'prepositional_object' })
+  })
+
   it('parses a preposition as transitive verb in presence of direct object', () => {
     const [mi, tawa, wawa, e, kiwen] = parse('mi tawa wawa e kiwen')
 
     expect([tawa, wawa].map(getRole)).toEqual(['predicate', 'complement'])
   })
 
-  it('parses a prepositional phrase outside of predicate head')
+  it('parses a prepositional phrase outside of predicate head', () => {
+    const [ona, li, lukin, e, jan, lon, telo] = parse('ona li lukin e jan lon telo')
+    
+    expect(telo).toInclude({ role: 'prepositional_object' })
+    expect(lon).toInclude({
+      role: 'complement',
+      head: lukin.id, // should be able to change
+    })
+  })
 
   it('parses compound predicates', () => {
     const [toki, , pona, , wawa] = parse('toki li pona li wawa')
@@ -186,7 +204,7 @@ describe('parser', () => {
     const [sina, pona1, ala, pona2] = parse('sina pona ala pona')
 
     expect([ala, pona2].map(getRole)).toEqual(['interrogative', 'interrogative'])
-    expect(pona2).toInclude({ word: 'pona' })
+    expect(pona2).toInclude({ text: 'pona' })
   })
 
   it('parses negation', () => {
@@ -213,7 +231,24 @@ describe('parser', () => {
     expect([ken, ala, awen].map(getRole)).toEqual(['predicate', 'negative', 'infinitive'])
   })
 
-  it('parses anu phrases')
+  it('parses anu phrase in subject', () => {
+    const [kili, anu, pan, li, pona] = parse('kili anu pan li pona')
 
-  it('parses proper nouns')
+    expect([kili, pan].map(getRole)).toEqual(['subject', 'subject'])
+  })
+
+  it('parses anu phrase in predicate', () => {
+    const [moku, li, ko, anu, telo] = parse('moku li ko anu telo')
+
+    expect([ko, telo].map(getRole)).toEqual(['predicate'])
+  })
+
+  it('parses proper nouns', () => {
+    const [jan, Sonja, li, mama, pi, toki, pona] = parse('jan Sonja li mama pi toki pona')
+
+    expect(Sonja).toInclude({
+      text: 'Sonja',
+      role: 'complement'
+    })
+  })
 })
