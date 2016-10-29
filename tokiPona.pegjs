@@ -3,14 +3,17 @@
   const flatten = (arrs) => arrs.reduce((a, b) => a.concat(b), [])
   const last = (arr) => arr[arr.length - 1]
   const init = (arr) => arr.slice(0, arr.length - 1)
+  const cast = (words, role) => words.map((w, i) => (i === 0 || words[i - 1] === 'anu') ? { ...w, role } : w)
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ text, id: v4()})
+  const phrase = (first, alternate) => [...first, ...(alternate ? ['anu', ...alternate] : [])]
+  // const complements = (head) => (c) => ({ ...c, role: c.role || 'complement', head: c.head || head.id })
   const complements = (head) => (c) => ({ ...c, role: c.role || 'complement', head: c.head || head.id })
-  const vocative = ([head, ...rest]) => [{ ...head, role: 'vocative' }, ...rest]
-  const predicate = ([head, ...rest]) => [{ ...head, role: 'predicate' }, ...rest]
-  const complement = ([head, ...rest]) => [{ ...head, role: 'complement' }, ...rest]
-  const subject = ([head, ...rest]) => [{ ...head, role: 'subject' }, ...rest]
+  const vocative = (words) => cast(words, 'vocative')
+  const predicate = (words) => cast(words, 'predicate')
+  const complement = (words) => cast(words, 'complement')
+  const subject = (words) => cast(words, 'subject')
   const endPunctuation = (text = '') => ({ role: 'end_punctuation', text })
   const punctuate = ({ before, after }, word) => ({
     ...(before ? { before } : {}),
@@ -41,22 +44,19 @@ Sentences
   = s:Sentence+ { return s }
 
 Sentence
-  = v:Vocative? cs:Context* c:Clause qm:QuestionMarker ep:EndPunctuation
-    { return [...(v || []), ...flatten(cs), ...punctuateLast(ep, [...c, ...qm])] }
-  / v:Vocative qm:QuestionMarker ep:EndPunctuation { return [...punctuateLast(ep, [...v, ...qm])] }
-
-QuestionMarker
-  = as:(Anu Seme)? { return as ? [{ text: 'anu seme', role: 'question_marker' }] : [] }
+  = v:Vocative? cs:Context* c:Clause ep:EndPunctuation
+    { return [...(v || []), ...flatten(cs), ...punctuateLast(ep, [...c])] }
+  / v:Vocative ep:EndPunctuation { return [...punctuateLast(ep, [...v])] }
 
 Vocative
-  = p:Phrase 'o' _ pu:[\,\!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
+  = p:Phrase 'o' pu:[\,\!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
 
 Context
   = c:Clause 'la' { return [...context(c), 'la'] }
 
 Clause
   = sp:SubjectAndParticle p:Predicate aps:AdditionalPredicate* { return [...sp, ...p, ...flatten(aps)] }
-  / _ ms:MS p:Predicate { return [...subject([word(ms)]), ...p] }
+  / ms:MS p:Predicate { return [...subject([word(ms)]), ...p] }
   / op:OptativeParticle p:Predicate aps:AdditionalPredicate* { return [...op, ...p, ...flatten(aps)] }
                                     // properly, this should only be with 'o'
   / p:Predicate { return p }
@@ -75,16 +75,16 @@ OptativeParticle
   = 'o'
 
 Predicate
-  = vp:PredicateVerbalPhrase dos:DirectObject+ { return [...vp, ...flatten(dos) ]}
+  = vp:VerbalPhrase dos:DirectObject+ { return [...vp, ...flatten(dos) ]}
   / prep:PrepositionalPhrase { const [first, ...rest] = prep; return [{ ...first, role: 'predicate' }, ...rest] }
   // but multiple prep phrases?
-  / vp:PredicateVerbalPhrase { return vp }
+  / vp:VerbalPhrase { return vp }
 
 AdditionalPredicate
   = mp:ModalParticle p:Predicate { return [mp, ...p] }
 
-PredicateVerbalPhrase
-  = pv:PreVerbWithPolarity vp:PredicateVerbalPhrase { return [...predicate(pv), ...infinitive(vp)] }
+VerbalPhrase
+  = pv:PreVerbWithPolarity vp:VerbalPhrase { return [...predicate(pv), ...infinitive(vp)] }
   / p:Phrase { return predicate(p) }
 
 PrepositionalPhrase
@@ -98,11 +98,15 @@ DirectObject
   = 'e' p:Phrase { return ['e', ...directObject(p)] }
 
 Phrase
-  = phrase:ComplexPhrase { return phrase }
-  / phrase:SubstantiveString { return phrase }
+  = cp:ComplexPhrase alternate:Alternate? { return phrase(cp, alternate) }
+  / ss:SubstantiveString alternate:Alternate? { return phrase(ss, alternate) }
+
+Alternate
+  = _? anu:'anu' p:Phrase { return p }
 
 ComplexPhrase
-  = ss:SubstantiveString cc:ComplexComplement+ {
+  = ss:SubstantiveString cc:ComplexComplement+  {
+    // console.log(alt);
     return [...ss,
     ...flatten(cc.map(([pi, subHead, ...rest]) => [pi, { ...subHead, head: ss[0].id }, ...rest]))
     ] }
@@ -112,6 +116,7 @@ ComplexComplement
   / 'pi' ss:SubstantiveString { return ['pi', ...ss]}
 
 SubstantiveString
+/*= s:SubstantiveWithPolarity+ alt:Alternate* { console.log(alt); const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }*/
 = s:SubstantiveWithPolarity+ { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }
 
 SubstantiveWithPolarity
@@ -119,23 +124,23 @@ SubstantiveWithPolarity
   / s:Substantive ala:Ala? { return [s, ...negative(ala)]}
 
 PreVerbWithPolarity
-  = _ pv1:PV ala:Ala pv2:PV _ & { return pv1 === pv2 } { return [word(pv1), ...interrogative(pv2)] }
-  / _ pv:PV ala:Ala? { return [word(pv), ...negative(ala)]}
+  = pv1:PV ala:Ala pv2:PV & { return pv1 === pv2 } { return [word(pv1), ...interrogative(pv2)] }
+  / pv:PV ala:Ala? { return [word(pv), ...negative(ala)]}
 
 PrepositionWithPolarity
-  = _ prep:PREP ala:Ala? { return [word(prep), ...negative(ala)] }
+  = prep:PREP ala:Ala? { return [word(prep), ...negative(ala)] }
 
 Substantive
   = NativeSubstantive / ProperNoun
 
 NativeSubstantive
-  = _ s:(MS / PV / PREP / CS / Seme) _ { return word(s) }
+  = s:(MS / PV / PREP / CS) { return word(s) }
 
 ProperNoun
-  = _ f:([A-Z])r:([a-z]i+) _ { return word([f, ...r].join(''))}
+  = _? f:([A-Z])r:([a-z]i+) _ { return word([f, ...r].join(''))}
 
 CS "common substantive"
-  = 'sitelen'/'kalama'/'soweli'/'pimeja'/'kulupu'/'sijelo'/'sinpin'
+  = _? x:('sitelen'/'kalama'/'soweli'/'pimeja'/'kulupu'/'sijelo'/'sinpin'
   /'pakala'/'palisa'/'namako'/'monsi'/'kiwen'/'utala'/'linja'/'pilin'
   /'akesi'/'tenpo'/'nanpa'/'nasin'/'alasa'/'musi'/'suli'/'kule'
   /'sike'/'suno'/'sewi'/'seme'/'selo'/'seli'/'insa'/'pona'/'poki'/'poka'
@@ -145,25 +150,22 @@ CS "common substantive"
   /'kala'/'lupa'/'unpa'/'luka'/'anpa'/'loje'/'lipu'/'jelo'/'lili'/'lete'/'weka'
   /'lawa'/'laso'/'lape'/'jaki'/'kute'/'walo'/'kon'/'ali'/'pan'/'ona'/'oko'
   /'jan'/'mun'/'ilo'/'ike'/'ijo'/'ale'/'uta'/'len'/'sin'/'wan'
-  /'kin'/'ma'/'ni'/'mu'/'tu'/'pu'/'ko'/'jo'/'a'
+  /'kin'/'ma'/'ni'/'mu'/'tu'/'pu'/'ko'/'jo'/'a') _ { return x }
 
 MS "microsubject"
-  = 'mi'/'sina'
+  = _? x:('mi'/'sina') _ { return x }
 
 PV "pre-verb"
-  = 'awen'/'kama'/'ken'/'lukin'/'sona'
+  = _? x:('awen'/'kama'/'ken'/'lukin'/'sona') _ { return x }
 
 PREP "preposition"
-  = 'kepeken'/'lon'/'sama'/'tan'/'tawa'
+  = _? x:('kepeken'/'lon'/'sama'/'tan'/'tawa') _ { return x }
 
 Ala
-  = _ ala:'ala' _ { return ala }
+  = _? ala:'ala' _ { return ala }
 
 Anu
-  = _ anu:'anu' _ { return anu }
-
-Seme
-  = _ seme:'seme' _ { return seme }
+  = _? anu:'anu' _ { return anu }
 
 _ "whitespace"
-  = [ \t\n\r]*
+  = [\n\r\t ]+ / ![a-zA-Z!?.]+

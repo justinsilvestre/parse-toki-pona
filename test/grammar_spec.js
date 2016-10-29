@@ -162,7 +162,7 @@ describe('parser', () => {
 
   it('parses a prepositional phrase outside of predicate head', () => {
     const [ona, li, lukin, e, jan, lon, telo] = parse('ona li lukin e jan lon telo')
-    
+
     expect(telo).toInclude({ role: 'prepositional_object' })
     expect(lon).toInclude({
       role: 'complement',
@@ -197,8 +197,6 @@ describe('parser', () => {
       role: 'vocative'
     })
   })
-
-  it('parses questions with anu seme')
 
   it('parses questions with ala', () => {
     const [sina, pona1, ala, pona2] = parse('sina pona ala pona')
@@ -240,7 +238,7 @@ describe('parser', () => {
   it('parses anu phrase in predicate', () => {
     const [moku, li, ko, anu, telo] = parse('moku li ko anu telo')
 
-    expect([ko, telo].map(getRole)).toEqual(['predicate'])
+    expect([ko, telo].map(getRole)).toEqual(['predicate', 'predicate'])
   })
 
   it('parses proper nouns', () => {
