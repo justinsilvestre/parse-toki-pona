@@ -161,13 +161,16 @@ describe('parser', () => {
   })
 
   it('parses a prepositional phrase outside of predicate head', () => {
-    const [ona, li, lukin, e, jan, lon, telo] = parse('ona li lukin e jan lon telo')
+    const [ona, li, moku, lon, telo, , toki, tawa, sina] = parse('ona li moku lon telo li toki tawa sina')
 
-    expect(telo).toInclude({ role: 'prepositional_object' })
-    expect(lon).toInclude({
-      role: 'complement',
-      head: lukin.id, // should be able to change
-    })
+    expect([lon, telo, tawa, sina].map(getRole)).toEqual(['complement', 'prepositional_object', 'complement', 'prepositional_object'])
+  })
+
+  it('associates prepositional phrase outside of predicate head with correct head', () => {
+    const [ona, li, moku, lon, telo, , toki, tawa, sina] = parse('ona li moku lon telo li toki tawa sina')
+
+    expect([lon, tawa].map((w) => w.head)).toEqual([moku, toki].map((w) => w.id))
+
   })
 
   it('parses compound predicates', () => {

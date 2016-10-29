@@ -8,10 +8,12 @@
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ text, id: v4()})
   const phrase = (first, alternate) => [...first, ...(alternate ? ['anu', ...alternate] : [])]
-  // const complements = (head) => (c) => ({ ...c, role: c.role || 'complement', head: c.head || head.id })
-  const complements = (head) => (c) => ({ ...c, role: c.role || 'complement', head: c.head || head.id })
+  const complements = (head) => (c) => ({ ...c, role: c.role || 'complement', head: c.head || head.id }) // test this works with anu
   const vocative = (words) => cast(words, 'vocative')
-  const predicate = (words) => cast(words, 'predicate')
+  const predicate = (words) => {
+    const finalPPs = flatten(last(words).finalPPs || []).map(complements(words[0]))
+    return cast([...words, ...finalPPs], 'predicate')
+  }
   const complement = (words) => cast(words, 'complement')
   const subject = (words) => cast(words, 'subject')
   const endPunctuation = (text = '') => ({ role: 'end_punctuation', text })
@@ -29,13 +31,15 @@
       ? { ...w, role: `context_${w.role}` }
       : w
   })
-  const infinitive = ([head, ...restOfVerbalPhrase]) => [{ ...head, role: 'infinitive' }, ...restOfVerbalPhrase]
-  const directObject = ([head, ...rest]) => [{ ...head, role: 'direct_object' }, ...rest]
-  const prepositionalObject = ([head, ...rest]) => [{ ...head, role: 'prepositional_object' }, ...rest]
+  const infinitive = (words) => cast(words, 'infinitive')
+  const directObject = (words) => cast(words, 'direct_object')
+  const prepositionalObject = (words) => cast(words, 'prepositional_object')
   const negative = (ala) => ala ? [{ text: 'ala', role: 'negative' }] : []
   const interrogative = (s) => [{ text: 'ala', role: 'interrogative' }, { text: s.text, role: 'interrogative' }]
 
   const vocativeParticle = { text: 'o', role: 'vocative_particle' }
+
+  const tagWithFinalPPs = (words, finalPPs) => [...init(words), { ...last(words), finalPPs }]
 }
 
 /* TODO: ACCOMMODATE COMMAS */
@@ -75,24 +79,24 @@ OptativeParticle
   = 'o'
 
 Predicate
-  = vp:VerbalPhrase dos:DirectObject+ { return [...vp, ...flatten(dos) ]}
-  / prep:PrepositionalPhrase { const [first, ...rest] = prep; return [{ ...first, role: 'predicate' }, ...rest] }
-  // but multiple prep phrases?
-  / vp:VerbalPhrase { return vp }
+  = vp:VerbalPhrase dos:DirectObject+ { return predicate([...vp, ...flatten(dos) ])}
+  / prep:PrepositionalPhrase { return predicate(prep) }
+  / vp:VerbalPhrase { return predicate(vp) }
+
 
 AdditionalPredicate
   = mp:ModalParticle p:Predicate { return [mp, ...p] }
 
 VerbalPhrase
-  = pv:PreVerbWithPolarity vp:VerbalPhrase { return [...predicate(pv), ...infinitive(vp)] }
-  / p:Phrase { return predicate(p) }
+  = pv:PreVerbWithPolarity vp:VerbalPhrase { return [...pv, ...infinitive(vp)] }
+  / p:Phrase { return p }
 
 PrepositionalPhrase
   = prep:PrepositionWithPolarity p:Phrase { return [...complement(prep), ...prepositionalObject(p)] }
 
 EndPunctuation
   = [\.\?\!]+ { return text() }
-  / ! { return '' }
+  / !. { return '' }
 
 DirectObject
   = 'e' p:Phrase { return ['e', ...directObject(p)] }
@@ -106,7 +110,6 @@ Alternate
 
 ComplexPhrase
   = ss:SubstantiveString cc:ComplexComplement+  {
-    // console.log(alt);
     return [...ss,
     ...flatten(cc.map(([pi, subHead, ...rest]) => [pi, { ...subHead, head: ss[0].id }, ...rest]))
     ] }
@@ -116,8 +119,12 @@ ComplexComplement
   / 'pi' ss:SubstantiveString { return ['pi', ...ss]}
 
 SubstantiveString
-/*= s:SubstantiveWithPolarity+ alt:Alternate* { console.log(alt); const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }*/
-= s:SubstantiveWithPolarity+ { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }
+/*= s:SubstantiveWithPolarity pp:(PrepositionalPhrase)+ EndPunctuation { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }*/
+= s:SubstantiveWithPolarity pps:(PrepositionalPhrase)+ PredicateEnd { const [head, ...rest] = flatten(s); return tagWithFinalPPs([head, ...rest.map(complements(head))], pps) }
+/ s:SubstantiveWithPolarity+ { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }
+
+PredicateEnd
+  =  !(!(EndPunctuation / 'li' / 'o'))
 
 SubstantiveWithPolarity
   = s1:Substantive ala:Ala s2:Substantive & { return s1.text === s2.text } { return [s1, ...interrogative(s1)] }
@@ -128,7 +135,8 @@ PreVerbWithPolarity
   / pv:PV ala:Ala? { return [word(pv), ...negative(ala)]}
 
 PrepositionWithPolarity
-  = prep:PREP ala:Ala? { return [word(prep), ...negative(ala)] }
+  = prep:PREP ala:Ala prep2:PREP & { return prep1 === prep2 } { return [word(prep1), ...interrogative(prep2)] }
+  / prep:PREP ala:Ala? { return [word(prep), ...negative(ala)] }
 
 Substantive
   = NativeSubstantive / ProperNoun
@@ -169,3 +177,6 @@ Anu
 
 _ "whitespace"
   = [\n\r\t ]+ / ![a-zA-Z!?.]+
+
+EOF
+  = !.
