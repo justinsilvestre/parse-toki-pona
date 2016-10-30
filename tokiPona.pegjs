@@ -121,9 +121,8 @@ ComplexComplement
   / 'pi' ss:SubstantiveString { return ['pi', ...ss]}
 
 SubstantiveString
-/*= s:SubstantiveWithPolarity pp:(PrepositionalPhrase)+ EndPunctuation { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }*/
-= s:SubstantiveWithPolarity pps:(PrepositionalPhrase)+ PredicateEnd { const [head, ...rest] = flatten(s); return tagWithFinalPPs([head, ...rest.map(complements(head))], pps) }
-/ s:SubstantiveWithPolarity+ { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }
+  = s:SubstantiveWithPolarity pps:(PrepositionalPhrase)+ PredicateEnd { const [head, ...rest] = flatten(s); return tagWithFinalPPs([head, ...rest.map(complements(head))], pps) }
+  / s:SubstantiveWithPolarity+ { const [head, ...rest] = flatten(s); return [head, ...rest.map(complements(head))] }
 
 PredicateEnd
   =  !(!(EndPunctuation / 'li' / 'o'))
@@ -178,7 +177,7 @@ Anu
   = _? anu:'anu' _ { return anu }
 
 _ "whitespace"
-  = [\n\r\t ]+ / ![a-zA-Z!?.]+
+  = [\n\r\t ]+ / ![a-zA-Z]+
 
 EOF
   = !.
