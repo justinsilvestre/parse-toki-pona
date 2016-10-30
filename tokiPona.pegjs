@@ -42,6 +42,8 @@
   const vocativeParticle = { text: 'o', role: 'vocative_particle' }
 
   const tagWithFinalPPs = (words, finalPPs) => [...init(words), m(last(words), { finalPPs })]
+
+  const l = (c) => console.log(c) || c
 }
 
 /* TODO: ACCOMMODATE COMMAS */
@@ -55,7 +57,7 @@ Sentence
   / v:Vocative ep:EndPunctuation { return [...punctuateLast(ep, [...v])] }
 
 Vocative
-  = p:Phrase 'o' pu:[\,\!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
+  = p:Phrase 'o' pu:[\,!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
 
 Context
   = c:Clause 'la' { return [...context(c), 'la'] }
@@ -74,11 +76,11 @@ AdditionalSubject
   = 'en' s:Phrase { return ['en', ...subject(s)] }
 
 ModalParticle
-  = 'li'
-  / OptativeParticle { return 'o' }
+  = _? 'li' _ { return 'li' }
+  / OptativeParticle
 
 OptativeParticle
-  = 'o'
+  = _? 'o' _ { return 'o' }
 
 Predicate
   = vp:VerbalPhrase dos:DirectObject+ { return predicate([...vp, ...flatten(dos) ])}

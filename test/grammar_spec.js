@@ -252,4 +252,8 @@ describe('parser', () => {
       role: 'complement'
     })
   })
+
+  it('accepts sentence before subjectless imperative sentence', () => {
+    parser.parse('toki! o lukin e lipu ni!')
+  })
 })
