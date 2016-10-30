@@ -4,7 +4,8 @@
   "description": "Parse Toki Pona sentences",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register"
+    "test": "mocha --compilers js:babel-core/register",
+    "build": "pegjs -o index.js tokiPona.pegjs"
   },
   "author": "Justin Silvestre",
   "license": "CC-BY-NC-SA-4.0",

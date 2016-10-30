@@ -1,14 +1,15 @@
 { // get options for alternative searching
   const { v4 } = require('uuid')
+  const m = (...objs) => Object.assign({}, ...objs)
   const flatten = (arrs) => arrs.reduce((a, b) => a.concat(b), [])
   const last = (arr) => arr[arr.length - 1]
   const init = (arr) => arr.slice(0, arr.length - 1)
-  const cast = (words, role) => words.map((w, i) => (i === 0 || words[i - 1] === 'anu') ? { ...w, role } : w)
+  const cast = (words, role) => words.map((w, i) => (i === 0 || words[i - 1] === 'anu') ? m(w, { role }) : w)
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ text, id: v4()})
   const phrase = (first, alternate) => [...first, ...(alternate ? ['anu', ...alternate] : [])]
-  const complements = (head) => (c) => ({ ...c, role: c.role || 'complement', head: c.head || head.id }) // test this works with anu
+  const complements = (head) => (c) => m(c, { role: c.role || 'complement', head: c.head || head.id }) // test this works with anu
   const vocative = (words) => cast(words, 'vocative')
   const predicate = (words) => {
     const finalPPs = flatten(last(words).finalPPs || []).map(complements(words[0]))
@@ -17,18 +18,19 @@
   const complement = (words) => cast(words, 'complement')
   const subject = (words) => cast(words, 'subject')
   const endPunctuation = (text = '') => ({ role: 'end_punctuation', text })
-  const punctuate = ({ before, after }, word) => ({
-    ...(before ? { before } : {}),
-    ...(after ? { after } : {}),
-    ...word
-  })
+  const punctuate = ({ before, after }, word) => m(
+    before ? { before } : {},
+    after ? { after } : {},
+    word
+  )
+
   const punctuateLast = (after, phrase) => [...init(phrase), punctuate({ after }, last(phrase))]
   const context = (clause) => clause.map(w => {
     if (!w.role)
       return w
 
     return (w.role === 'subject' || w.role === 'predicate')
-      ? { ...w, role: `context_${w.role}` }
+      ? m(w, { role: `context_${w.role}` })
       : w
   })
   const infinitive = (words) => cast(words, 'infinitive')
@@ -39,7 +41,7 @@
 
   const vocativeParticle = { text: 'o', role: 'vocative_particle' }
 
-  const tagWithFinalPPs = (words, finalPPs) => [...init(words), { ...last(words), finalPPs }]
+  const tagWithFinalPPs = (words, finalPPs) => [...init(words), m(last(words), { finalPPs })]
 }
 
 /* TODO: ACCOMMODATE COMMAS */
@@ -111,7 +113,7 @@ Alternate
 ComplexPhrase
   = ss:SubstantiveString cc:ComplexComplement+  {
     return [...ss,
-    ...flatten(cc.map(([pi, subHead, ...rest]) => [pi, { ...subHead, head: ss[0].id }, ...rest]))
+    ...flatten(cc.map(([pi, subHead, ...rest]) => [pi, m(subHead, { head: ss[0].id }), ...rest]))
     ] }
 
 ComplexComplement
