@@ -256,4 +256,13 @@ describe('parser', () => {
   it('accepts sentence before subjectless imperative sentence', () => {
     parser.parse('toki! o lukin e lipu ni!')
   })
+
+  it('counts head of pi-complement as complement', () => {
+    const [toki, li, ijo, pi, pona, mute] = parse('toki li ijo pi pona mute')
+
+    expect(pona).toInclude({
+      role: 'complement',
+      head: ijo.id,
+    })
+  })
 })

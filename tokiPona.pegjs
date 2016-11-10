@@ -113,9 +113,9 @@ Alternate
   = _? anu:'anu' p:Phrase { return p }
 
 ComplexPhrase
-  = ss:SubstantiveString cc:ComplexComplement+  {
+  = ss:SubstantiveString ccs:ComplexComplement+  {
     return [...ss,
-    ...flatten(cc.map(([pi, subHead, ...rest]) => [pi, m(subHead, { head: ss[0].id }), ...rest]))
+    ...flatten(ccs.map(([pi, ...cc]) => [pi, ...cc.map(complements(ss[0]))]))
     ] }
 
 ComplexComplement
