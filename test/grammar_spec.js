@@ -99,6 +99,12 @@ describe('parser', () => {
     })
   })
 
+  it('links subject to proper context predicate', () => {
+    const [ken, la, ona, en, sina, li, pona, , mi, kama] = parse('ken la ona en sina li pona la mi kama')
+
+    expect([ona, sina].map(w => w.context)).toEqual([pona.context, pona.context])
+  })
+
   it('parses a predicate in microsubject sentence', () => {
     const [mi, pona] = parse('mi pona')
 
@@ -195,6 +201,14 @@ describe('parser', () => {
 
   it('parses a lone vocative expression as sentence', () => {
     const [sewi, o] = parse('sewi o!')
+
+    expect(sewi).toInclude({
+      role: 'vocative'
+    })
+  })
+
+  it('parses a lone vocative expression as sentence even without punctuation', () => {
+    const [sewi, o] = parse('sewi o')
 
     expect(sewi).toInclude({
       role: 'vocative'

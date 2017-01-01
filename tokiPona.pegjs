@@ -53,11 +53,12 @@ Sentences
 
 Sentence
   = v:Vocative? cs:Context* c:Clause ep:EndPunctuation
-    { return [...(v || []), ...flatten(cs), ...punctuateLast(ep, [...c])] }
+    { return [...(v || []), ...flatten(cs.map((c, i) => c.map((w) => (w.role || '').startsWith('context') ? m(w, { context: i }) : w))), ...punctuateLast(ep, [...c])] }
   / v:Vocative ep:EndPunctuation { return [...punctuateLast(ep, [...v])] }
 
 Vocative
-  = p:Phrase 'o' pu:[\,!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
+  = p:Phrase 'o' ep:EndPunctuation { return [...vocative(p), punctuate({ after: ep }, vocativeParticle)] }
+  / p:Phrase 'o' pu:[\,!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
 
 Context
   = c:Clause 'la' { return [...context(c), 'la'] }
