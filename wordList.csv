@@ -1,4 +1,4 @@
-a,p,x,"(emphasis, emotion or confirmation)"
+a,p,x,"(emphasis,emotion or confirmation)"
 a,i,adv,indeed,too,also,even,really
 kin,alt,a
 akesi,i,n,creature,reptile,amphibian,non-cute animal,vermin
@@ -9,7 +9,7 @@ alasa,t,vt,forage for,hunt,harvest
 alasa,i,vi,forage,hunt,harvest
 alasa,i,n,hunt,wild game
 ale,i,adj,all,complete,abundant,whole,entire,countless,bountiful,plentiful
-ale,i,d,all,every,a hundred, one hundred
+ale,i,d,all,every,a hundred,one hundred
 ale,i,n,abundance,life,world,universe
 ale,i,pn,everything,all
 ali,alt,ale
@@ -45,7 +45,7 @@ insa,i,n,center,content,inside,interval,space between,internal organ,stomach
 jaki,i,adj,disgusting,dirty,obscene,sickly,toxic,unclean,unsanitary
 jaki,i,n,filth,garbage,dirt,pollution
 jaki,t,vt,soil,dirty,pollute
-jaki,clau,int,ew,yuck
+jaki,i,int,ew,yuck
 jan,i,n,human being,person
 jan,i,pn,somebody,someone,anybody,anyone
 jan,i,d,somebody's,someone's,anybody's,anyone's
@@ -82,15 +82,15 @@ kon,i,n,air,breath,wind,smell,essence,spirit,hidden reality,unseen agent
 kon,i,adj,ethereal,gaseous
 kule,i,adj,colorful,pigmented,painted
 kule,i,n,color,paint
-kule,vt,color,paint
+kule,t,vt,color,paint
 kulupu,i,n,community,company,group,nation,society,tribe
 kulupu,i,vi,gather
 kulupu,i,dp,a group of,many
 kute,i,n,ear
 kute,t,vt,hear,listen,pay attention to,obey
 kute,i,adj,auditory
-la,i,conj,when,if,as,whenever,while
-la,i,prep,during,at (time),as for,when it comes to
+la,p,conj,when,if,as,whenever,while
+la,p,prep,during,at (time),as for,when it comes to
 la,p,x,(separates context from rest of sentence)
 lape,i,adj,dormant
 lape,i,vi,sleep,rest
@@ -112,14 +112,14 @@ lili,t,vt,reduce,shorten,shrink,lessen
 linja,i,n,long and flexible thing,cord,hair,rope,thread,string,yarn,chain
 lipu,i,n,flat object,book,document,card,paper,record,website,ticket
 loje,i,adj,red,reddish
-lon,prep,prep,(located) at, located at, present at
+lon,prep,prep,(located) at,located at,present at
 lon,t,vt,bring out,realize
 lon,i,vi,exist,be (there)
 lon,i,adj,real,true,existent
 luka,i,n,arm,hand,paw,tactile organ
 luka,i,num,five
 lukin,i,n,eye
-lukin,i,vi,look,see,examine,observe,read,watch, watch out, pay attention
+lukin,i,vi,look,see,examine,observe,read,watch,watch out,pay attention
 lukin,t,vt,look at,see,seek,look for,examine,read,watch,pay attention to,observe
 lukin,prev,vt,try (to)
 lukin,i,adj,visual
@@ -148,6 +148,7 @@ moli,i,vi,die
 moli,t,vt,kill
 monsi,i,n,back,behind,rear
 mu,i,int,moo,meow,woof,(animal noise or communication)
+mu,i,onom,moo,meow,woof,(animal noise or communication)
 mun,i,n,moon
 mun,i,adj,lunar,monthly
 musi,i,adj,artful,artistic,entertaining,frivolous,playful,recreational
@@ -163,7 +164,7 @@ mute,i,adv,much,very,really
 mute,i,adj,abundant,multiple,many,plenty
 mute,t,vt,multiply,increase
 nanpa,i,n,number
-nanpa,i,p,(signals ordinal number)
+nanpa,i,x,(signals ordinal number)
 nasa,i,adj,unusual,strange,foolish,crazy,drunk,intoxicated
 nasin,i,n,way,road,manner,custom,doctrine,method,path,road,system
 nena,i,n,bump,button,hill,mountain,nose,protuberance
@@ -175,7 +176,7 @@ nimi,i,n,name,word
 nimi,i,adj,verbal
 noka,i,n,foot,leg,bottom,lower part,organ of locomotion
 o,p,x,(vocative or imperative)
-o,p,interj,O
+o,p,int,O
 olin,t,vt,love,have compassion for,respect,show affection to
 olin,i,n,love,compassion,respect,esteem
 ona,i,pnsn,he,she
@@ -210,12 +211,12 @@ poki,i,n,container,bag,bowl,box,cup,cupboard,drawer,vessel
 pona,i,adj,good,positive,useful,friendly,peaceful,simple
 pona,i,n,good,simplicity,positivity,goodness
 pona,t,vt,improve,fix,repair,better
-pona,clau,int,yay,hooray,hurrah
+pona,i,int,yay,hooray,hurrah
 pu,i,pn,the official Toki Pona book
 pu,i,vi,read the official Toki Pona book,interact with the official Toki Pona book
 sama,i,adj,similar,fellow,common
 sama,i,pno,each other,one another,the same
-sama,d,the same
+sama,i,d,the same
 sama,i,n,sibling,peer,fellow
 sama,prep,prep,as,like,such as,similar to,the same as
 seli,i,n,fire,light,cooking element,chemical reaction,heat source
@@ -253,7 +254,7 @@ tan,i,n,origin,cause
 taso,i,conj,but,however,except
 taso,i,adj,only,sole
 taso,i,adv,only,just
-tawa,prep,to (direction),going to,toward,approaching,moving to,until,for (from the perspective of),to (from the perspective of)
+tawa,prep,prep,to (direction),going to,toward,approaching,moving to,until,for (from the perspective of),to (from the perspective of)
 tawa,prep,vt,go to,move to,move towards,approach
 tawa,t,vt,e,move,displace
 tawa,i,vi,go,leave,move,walk,travel
@@ -265,10 +266,11 @@ tenpo,i,n,time,duration,moment,occasion,period,situation
 toki,i,vi,communicate,say,speak,talk,use language,think
 toki,t,vt,say,speak
 toki,i,n,language,tongue,speech
-toki,pred,int,hello,hi
+toki,i,int,hello,hi
 tomo,i,n,building,indoor space,home,house,room
 tomo,i,adj,domestic,urban,household
-tu,i,adj,two,double
+tu,i,num,two
+tu,i,adj,double
 tu,i,dp,a pair of
 tu,i,n,pair
 unpa,t,vt,have sexual relations with,have marital relations with
@@ -281,11 +283,12 @@ uta,t,vt,kiss,bite
 utala,t,vt,battle,challenge,compete against,struggle against
 walo,i,adj,white,whitish,light-colored,pale
 wan,i,adj,unique,united
-wan,i,adj,one,single
+wan,i,adj,single
+wan,i,num,one
 waso,i,n,bird,flying creature,winged animal
 wawa,i,adj,strong,powerful,confident,sure,energetic,intense
 weka,i,adj,absent,away
 weka,t,vt,ignore,remove,shun,repel
 wile,prev,vm,must,should,have to,wish to
 wile,t,vt,need,require,want,wish for
-wile,i,n,"will (wish, desire)"
+wile,i,n,"will (wish,desire)"

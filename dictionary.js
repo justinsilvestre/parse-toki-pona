@@ -6,32 +6,27 @@ const input = fs.readFileSync(path.join(__dirname, 'wordList.csv'), 'utf8')
 
 const csvToJSON = (csvData) => csvData.map((line) => {
   if (line[1] === 'alt') {
-    const [head, _, principle] = line
+    const [head, , principle] = line
 
-    return {
-      [head]: principle
-    }
+    return { head, principle }
   } else {
-    const [head, syntax, semantics, ...translations] = line
+    const [head, tpPOS, enPOS, ...translations] = line
 
-    return {
-      [head]: { [syntax]: translations },
-    }
+    return { head, tpPOS, enPOS, translations}
   }
-}).reduce((hash, entry) => {
-  const [head] = Object.keys(entry)
-
-  if (typeof entry[head] === 'string') { // alternate word
-    return Object.assign({}, hash, entry)
+}).reduce((hash, { head, principle, tpPOS, enPOS, translations }) => {
+  if (principle) { // alternate word
+    return Object.assign({}, hash, { [head]: { principle } })
   }
 
-  const [syntax] = Object.keys(entry[head])
   const existingEntryData = hash[head] || {}
-  const existingTranslations = existingEntryData[syntax] || []
+  const existingTranslations = existingEntryData[tpPOS] || []
+
+  const newTranslations = translations.map((text) => ({ text, pos: enPOS }))
 
   return Object.assign({}, hash, {
     [head]: Object.assign({}, existingEntryData, {
-      [syntax]: [...existingTranslations, ...entry[head][syntax]]
+      [tpPOS]: [...existingTranslations, ...newTranslations]
     }),
   })
 }, {})
