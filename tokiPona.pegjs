@@ -4,11 +4,11 @@
   const flatten = (arrs) => arrs.reduce((a, b) => a.concat(b), [])
   const last = (arr) => arr[arr.length - 1]
   const init = (arr) => arr.slice(0, arr.length - 1)
-  const cast = (words, role) => words.map((w, i) => (i === 0 || words[i - 1] === 'anu') ? m(w, { role }) : w)
+  const cast = (words, role) => words.map((w, i) => (i === 0 || words[i - 1].text === 'anu') ? m(w, { role }) : w)
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ text, id: v4()})
-  const phrase = (first, alternate) => [...first, ...(alternate ? ['anu', ...alternate] : [])]
+  const phrase = (first, alternate) => [...first, ...(alternate ? [word('anu'), ...alternate] : [])]
   const complements = (head) => (c) => m(c, { role: c.role || 'complement', head: c.head || head.id }) // test this works with anu
   const vocative = (words) => cast(words, 'vocative')
   const predicate = (words) => {
@@ -36,10 +36,10 @@
   const infinitive = (words) => cast(words, 'infinitive')
   const directObject = (words) => cast(words, 'direct_object')
   const prepositionalObject = (words) => cast(words, 'prepositional_object')
-  const negative = (ala) => ala ? [{ text: 'ala', role: 'negative' }] : []
-  const interrogative = (s) => [{ text: 'ala', role: 'interrogative' }, { text: s.text, role: 'interrogative' }]
+  const negative = (ala) => ala ? [{ text: 'ala', role: 'negative', id: v4() }] : []
+  const interrogative = (s) => [{ text: 'ala', role: 'interrogative', id: v4() }, { text: s.text, role: 'interrogative_repetition', id: v4() }]
 
-  const vocativeParticle = { text: 'o', role: 'vocative_particle' }
+  const vocativeParticle = { text: 'o', role: 'vocative_particle', id: v4() }
 
   const tagWithFinalPPs = (words, finalPPs) => [...init(words), m(last(words), { finalPPs })]
 
@@ -61,12 +61,12 @@ Vocative
   / p:Phrase 'o' pu:[\,!] { return [...vocative(p), punctuate({ after: pu }, vocativeParticle)] }
 
 Context
-  = c:Clause 'la' { return [...context(c), 'la'] }
+  = c:Clause 'la' { return [...context(c), word('la')] }
 
 Clause
   = sp:SubjectAndParticle p:Predicate aps:AdditionalPredicate* { return [...sp, ...p, ...flatten(aps)] }
   / ms:MS p:Predicate { return [...subject([word(ms)]), ...p] }
-  / op:OptativeParticle p:Predicate aps:AdditionalPredicate* { return [...op, ...p, ...flatten(aps)] }
+  / op:OptativeParticle p:Predicate aps:AdditionalPredicate* { return [op, ...p, ...flatten(aps)] }
                                     // properly, this should only be with 'o'
   / p:Predicate { return p }
 
@@ -74,14 +74,14 @@ SubjectAndParticle
   = s:Phrase ass:AdditionalSubject* mp:ModalParticle { return [...subject(s), ...flatten(ass), mp] }
 
 AdditionalSubject
-  = 'en' s:Phrase { return ['en', ...subject(s)] }
+  = 'en' s:Phrase { return [word('en'), ...subject(s)] }
 
 ModalParticle
-  = _? 'li' _ { return 'li' }
+  = _? 'li' _ { return word('li') }
   / OptativeParticle
 
 OptativeParticle
-  = _? 'o' _ { return 'o' }
+  = _? 'o' _ { return word('o') }
 
 Predicate
   = vp:VerbalPhrase dos:DirectObject+ { return predicate([...vp, ...flatten(dos) ])}
@@ -104,7 +104,7 @@ EndPunctuation
   / !. { return '' }
 
 DirectObject
-  = 'e' p:Phrase { return ['e', ...directObject(p)] }
+  = 'e' p:Phrase { return [word('e'), ...directObject(p)] }
 
 Phrase
   = cp:ComplexPhrase alternate:Alternate? { return phrase(cp, alternate) }
@@ -120,8 +120,8 @@ ComplexPhrase
     ] }
 
 ComplexComplement
-  = 'pi' pp:PrepositionalPhrase { return ['pi', ...pp] }
-  / 'pi' ss:SubstantiveString { return ['pi', ...ss]}
+  = 'pi' pp:PrepositionalPhrase { return [word('pi'), ...pp] }
+  / 'pi' ss:SubstantiveString { return [word('pi'), ...ss]}
 
 SubstantiveString
   = s:SubstantiveWithPolarity pps:(PrepositionalPhrase)+ PredicateEnd { const [head, ...rest] = flatten(s); return tagWithFinalPPs([head, ...rest.map(complements(head))], pps) }
@@ -177,7 +177,7 @@ Ala
   = _? ala:'ala' _ { return ala }
 
 Anu
-  = _? anu:'anu' _ { return anu }
+  = _? anu:'anu' _ { return word(anu) }
 
 _ "whitespace"
   = [\n\r\t ]+ / ![a-zA-Z]+

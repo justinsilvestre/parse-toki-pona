@@ -20,6 +20,9 @@ const parse = (text) => {
       + `Compare "${reconstructed}" to "${text}"`)
   }
 
+  const noId = data.find(v => !v.id)
+  if (noId) throw new Error(`Word is lacking id: ${noId}`)
+
   return data
 }
 
@@ -218,7 +221,7 @@ describe('parser', () => {
   it('parses questions with ala', () => {
     const [sina, pona1, ala, pona2] = parse('sina pona ala pona')
 
-    expect([ala, pona2].map(getRole)).toEqual(['interrogative', 'interrogative'])
+    expect([ala, pona2].map(getRole)).toEqual(['interrogative', 'interrogative_repetition'])
     expect(pona2).toInclude({ text: 'pona' })
   })
 
