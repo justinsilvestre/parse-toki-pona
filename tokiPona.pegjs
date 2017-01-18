@@ -100,7 +100,7 @@ PrepositionalPhrase
   = prep:PrepositionWithPolarity p:Phrase { return [...complement(prep), ...prepositionalObject(p)] }
 
 EndPunctuation
-  = [\.\?\!]+ { return text() }
+  = [\.\?\!\:]+ { return text() }
   / !. { return '' }
 
 DirectObject
