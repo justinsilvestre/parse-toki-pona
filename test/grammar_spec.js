@@ -137,7 +137,8 @@ describe('parser', () => {
     const [mi, moku, e, pan] = parse('mi moku e pan')
 
     expect(pan).toInclude({
-      role: 'direct_object'
+      role: 'direct_object',
+      verb: moku.id,
     })
   })
 

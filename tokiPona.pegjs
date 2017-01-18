@@ -84,7 +84,10 @@ OptativeParticle
   = _? 'o' _ { return word('o') }
 
 Predicate
-  = vp:VerbalPhrase dos:DirectObject+ { return predicate([...vp, ...flatten(dos) ])}
+  = vp:VerbalPhrase dos:DirectObject+ {
+    const tv = (vp[vp.findIndex(w => w.role === 'complement') - 1] || last(vp)).id;
+    return predicate([...vp, ...flatten(dos.map(([e, h, ...r]) => [e, m(h, { verb: tv }), ...r])) ])
+  }
   / prep:PrepositionalPhrase { return predicate(prep) }
   / vp:VerbalPhrase { return predicate(vp) }
 
