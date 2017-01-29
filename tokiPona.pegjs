@@ -9,15 +9,15 @@
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ text, id: v4()})
   const phrase = (first, alternate) => [...first, ...(alternate ? [word('anu'), ...alternate] : [])]
-  const complements = (head) => (c) => m(c, { role: c.role || 'complement', head: c.head || head.id }) // test this works with anu
-  const vocative = (words) => cast(words, 'vocative')
+  const complements = (head) => (c) => m(c, { role: c.role || 'COMPLEMENT', head: c.head || head.id }) // test this works with anu
+  const vocative = (words) => cast(words, 'VOCATIVE')
   const predicate = (words) => {
     const finalPPs = flatten(last(words).finalPPs || []).map(complements(words[0]))
-    return cast([...words, ...finalPPs], 'predicate')
+    return cast([...words, ...finalPPs], 'PREDICATE')
   }
-  const complement = (words) => cast(words, 'complement')
-  const subject = (words) => cast(words, 'subject')
-  const endPunctuation = (text = '') => ({ role: 'end_punctuation', text })
+  const complement = (words) => cast(words, 'COMPLEMENT')
+  const subject = (words) => cast(words, 'SUBJECT')
+  const endPunctuation = (text = '') => ({ role: 'END_PUNCTUATION', text })
   const punctuate = ({ before, after }, word) => m(
     before ? { before } : {},
     after ? { after } : {},
@@ -29,17 +29,17 @@
     if (!w.role)
       return w
 
-    return (w.role === 'subject' || w.role === 'predicate')
-      ? m(w, { role: `context_${w.role}` })
+    return (w.role === 'SUBJECT' || w.role === 'PREDICATE')
+      ? m(w, { role: `CONTEXT_${w.role}` })
       : w
   })
-  const infinitive = (words) => cast(words, 'infinitive')
-  const directObject = (words) => cast(words, 'direct_object')
-  const prepositionalObject = (words) => cast(words, 'prepositional_object')
-  const negative = (ala) => ala ? [{ text: 'ala', role: 'negative', id: v4() }] : []
-  const interrogative = (s) => [{ text: 'ala', role: 'interrogative', id: v4() }, { text: s.text, role: 'interrogative_repetition', id: v4() }]
+  const infinitive = (words) => cast(words, 'INFINITIVE')
+  const directObject = (words) => cast(words, 'DIRECT_OBJECT')
+  const prepositionalObject = (words) => cast(words, 'PREPOSITIONAL_OBJECT')
+  const negative = (ala) => ala ? [{ text: 'ala', role: 'NEGATIVE', id: v4() }] : []
+  const interrogative = (s) => [{ text: 'ala', role: 'INTERROGATIVE', id: v4() }, { text: s.text, role: 'INTERROGATIVE_REPETITION', id: v4() }]
 
-  const vocativeParticle = { text: 'o', role: 'vocative_particle', id: v4() }
+  const vocativeParticle = { text: 'o', role: 'VOCATIVE_PARTICLE', id: v4() }
 
   const tagWithFinalPPs = (words, finalPPs) => [...init(words), m(last(words), { finalPPs })]
 
@@ -53,7 +53,7 @@ Sentences
 
 Sentence
   = v:Vocative? cs:Context* c:Clause ep:EndPunctuation
-    { return [...(v || []), ...flatten(cs.map((c, i) => c.map((w) => (w.role || '').startsWith('context') ? m(w, { context: i }) : w))), ...punctuateLast(ep, [...c])] }
+    { return [...(v || []), ...flatten(cs.map((c, i) => c.map((w) => (w.role || '').startsWith('CONTEXT') ? m(w, { context: i }) : w))), ...punctuateLast(ep, [...c])] }
   / v:Vocative ep:EndPunctuation { return [...punctuateLast(ep, [...v])] }
 
 Vocative
@@ -85,7 +85,7 @@ OptativeParticle
 
 Predicate
   = vp:VerbalPhrase dos:DirectObject+ {
-    const tv = (vp[vp.findIndex(w => w.role === 'complement') - 1] || last(vp)).id;
+    const tv = (vp[vp.findIndex(w => w.role === 'COMPLEMENT') - 1] || last(vp)).id;
     return predicate([...vp, ...flatten(dos.map(([e, h, ...r]) => [e, m(h, { verb: tv }), ...r])) ])
   }
   / prep:PrepositionalPhrase { return predicate(prep) }
