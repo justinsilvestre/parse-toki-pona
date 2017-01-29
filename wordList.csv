@@ -29,9 +29,8 @@ awen,i,vt,continue,keep on
 awen,i,vi,continue,endure,keep,wait,stay
 awen,prev,vt,continue,keep on
 e,p,x,(before the direct object)
-e,i,conj,and (between multiple direct objects)
-en,p,conj,and (between multiple subjects)
-en,i,conj,and (between multiple subjects)
+e,i,xconj,and (between multiple direct objects)
+en,p,xconj,and (between multiple subjects)
 esun,i,n,market,shop,fair,bazaar,business transaction
 ijo,i,n,thing,stuff,phenomenon,object,matter
 ijo,i,pn,something,anything
@@ -90,7 +89,7 @@ kute,i,n,ear
 kute,t,vt,hear,listen,pay attention to,obey
 kute,i,adj,auditory
 la,p,conj,when,if,as,whenever,while
-la,p,prep,during,at (time),as for,when it comes to
+la,p,xprep,during,at (time),as for,when it comes to
 la,p,x,(separates context from rest of sentence)
 lape,i,adj,dormant
 lape,i,vi,sleep,rest
@@ -105,7 +104,7 @@ lete,i,adj,cold,cool,uncooked,raw
 lete,i,n,cold
 lete,t,vt,cool down,chill
 li,p,x,(between any subject except mi alone or sina alone and its verb. also to introduce a new verb for the same subject)
-li,i,conj,and
+li,p,xconj,and
 lili,i,adj,little,small,short,few,young
 lili,i,adv,a little,a bit,barely
 lili,t,vt,reduce,shorten,shrink,lessen
@@ -176,7 +175,7 @@ nimi,i,n,name,word
 nimi,i,adj,verbal
 noka,i,n,foot,leg,bottom,lower part,organ of locomotion
 o,p,x,(vocative or imperative)
-o,p,int,O
+o,p,xint,O
 olin,t,vt,love,have compassion for,respect,show affection to
 olin,i,n,love,compassion,respect,esteem
 ona,i,pnsn,he,she
@@ -196,7 +195,7 @@ palisa,i,n,long hard thing,branch,rod,stick
 pan,i,n,cereal,grain,barley,corn,oat,rice,wheat,bread,pasta
 pana,i,vt,give,send,emit,provide,put,release
 pi,p,x,(signals nested modifiers)
-pi,i,prep,of,about (topic of discussion),regarding (topic of discussion),concerning (topic of discussion),for (purpose)
+pi,i,xprep,of,about (topic of discussion),regarding (topic of discussion),concerning (topic of discussion),for (purpose)
 pilin,i,n,feeling,heart,emotion,experience
 pilin,i,adj,feeling,emotion,experience
 pimeja,i,adj,black,dark,unlit
@@ -237,7 +236,7 @@ sina,i,d,your
 sina,i,adj,of yours
 sinpin,i,n,face,foremost,front,wall
 sitelen,i,n,image,picture,representation,symbol,mark,writing
-sona,i,vt,know,know how (to),be skilled in,be wise about,have information on
+sona,t,vt,know,know how (to),be skilled in,be wise about,have information on
 sona,i,n,knowledge,wisdom
 soweli,i,n,animal,beast,land mammal
 suli,i,adj,big,heavy,large,great,long,tall,important,adult
