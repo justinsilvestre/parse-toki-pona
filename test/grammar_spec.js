@@ -34,7 +34,7 @@ describe('parser', () => {
 
     expect(toki).toInclude({
       text: 'toki',
-      role: 'predicate'
+      role: 'PREDICATE'
     })
     expect(toki.id).toExist()
   })
@@ -44,7 +44,7 @@ describe('parser', () => {
 
     expect(pona).toInclude({
       text: 'pona',
-      role: 'complement',
+      role: 'COMPLEMENT',
       head: toki.id,
     })
   })
@@ -53,7 +53,7 @@ describe('parser', () => {
     const [toki, pona, lili] = parse('toki pona lili')
 
     expect(lili).toInclude({
-      role: 'complement',
+      role: 'COMPLEMENT',
       head: toki.id,
     })
   })
@@ -76,7 +76,7 @@ describe('parser', () => {
     const [toki, li, pona] = parse('toki li pona')
 
     expect(pona).toInclude({
-      role: 'predicate'
+      role: 'PREDICATE'
     })
   })
 
@@ -84,35 +84,35 @@ describe('parser', () => {
     const [toki, li, pona] = parse('toki li pona')
 
     expect(toki).toInclude({
-      role: 'subject'
+      role: 'SUBJECT'
     })
   })
 
   it('parses a compound subject', () => {
     const [toki, en, pali] = parse('mi en sina li pona')
 
-    expect([toki, pali].map(getRole)).toEqual(['subject', 'subject'])
+    expect([toki, pali].map(getRole)).toEqual(['SUBJECT', 'SUBJECT'])
   })
 
   it('parses a microsubject', () => {
     const [mi, pona] = parse('mi pona')
 
     expect(mi).toInclude({
-      role: 'subject'
+      role: 'SUBJECT'
     })
   })
 
   it('links subject to proper context predicate', () => {
     const [ken, la, ona, en, sina, li, pona, , mi, kama] = parse('ken la ona en sina li pona la mi kama')
 
-    expect([ona, sina].map(w => w.context)).toEqual([pona.context, pona.context])
+    expect([ona, sina].map(w => w.context).filter(v => v)).toEqual([pona.context, pona.context])
   })
 
   it('parses a predicate in microsubject sentence', () => {
     const [mi, pona] = parse('mi pona')
 
     expect(pona).toInclude({
-      role: 'predicate'
+      role: 'PREDICATE'
     })
   })
 
@@ -120,7 +120,7 @@ describe('parser', () => {
     const [mi, mute, li, pona] = parse('mi mute li pona')
 
     expect(mute).toInclude({
-      role: 'complement',
+      role: 'COMPLEMENT',
       head: mi.id
     })
   })
@@ -129,7 +129,7 @@ describe('parser', () => {
     const [ken, la, sina, pona] = parse('ken la sina pona')
 
     expect(ken).toInclude({
-      role: 'context_predicate'
+      role: 'CONTEXT_PREDICATE'
     })
   })
 
@@ -137,69 +137,80 @@ describe('parser', () => {
     const [mi, moku, e, pan] = parse('mi moku e pan')
 
     expect(pan).toInclude({
-      role: 'direct_object',
-      verb: moku.id,
+      role: 'DIRECT_OBJECT',
+      parent: moku.id,
     })
   })
 
   it('parses a pre-verb with infinitive', () => {
     const [sina, ken, pona] = parse('sina ken pona')
 
-    expect([ken, pona].map(getRole)).toEqual(['predicate', 'infinitive'])
+    expect([ken, pona].map(getRole)).toEqual(['PREDICATE', 'INFINITIVE'])
   })
 
   it('parses a prepositional predicate', () => {
     const [sina, lon, sewi] = parse('sina lon sewi')
 
-    expect([lon, sewi].map(getRole)).toEqual(['predicate', 'prepositional_object'])
+    expect([lon, sewi].map(getRole)).toEqual(['PREDICATE', 'PREPOSITIONAL_OBJECT'])
   })
 
   it('parses a prepositional complement with pi', () => {
     const [jan, pi, lon, tomo, li, wawa] = parse('jan pi lon tomo li wawa')
 
     expect(lon).toInclude({
-      role: 'complement',
+      role: 'COMPLEMENT',
       head: jan.id
     })
-    expect(tomo).toInclude({ role: 'prepositional_object' })
+    expect(tomo).toInclude({ role: 'PREPOSITIONAL_OBJECT' })
   })
 
   it('parses a preposition as transitive verb in presence of direct object', () => {
     const [mi, tawa, wawa, e, kiwen] = parse('mi tawa wawa e kiwen')
 
-    expect([tawa, wawa].map(getRole)).toEqual(['predicate', 'complement'])
+    expect([tawa, wawa].map(getRole)).toEqual(['PREDICATE', 'COMPLEMENT'])
   })
 
   it('parses a prepositional phrase outside of predicate head', () => {
     const [ona, li, moku, lon, telo, , toki, tawa, sina] = parse('ona li moku lon telo li toki tawa sina')
 
-    expect([lon, telo, tawa, sina].map(getRole)).toEqual(['complement', 'prepositional_object', 'complement', 'prepositional_object'])
+    expect([lon, telo, tawa, sina].map(getRole)).toEqual(['COMPLEMENT', 'PREPOSITIONAL_OBJECT', 'COMPLEMENT', 'PREPOSITIONAL_OBJECT'])
   })
 
   it('associates prepositional phrase outside of predicate head with correct head', () => {
     const [ona, li, moku, lon, telo, , toki, tawa, sina] = parse('ona li moku lon telo li toki tawa sina')
 
     expect([lon, tawa].map((w) => w.head)).toEqual([moku, toki].map((w) => w.id))
+  })
 
+  it('associates prepositional object with preposition', () => {
+    const [mi, lon, ala, ma, lili] = parse('mi lon ala ma lili')
+
+    expect(ma.parent).toEqual(lon.id)
+  })
+
+  it('associates infinitive with verb', () => {
+    const [mi, ken, ala, moku, e, akesi] = parse('mi ken ala moku e akesi')
+
+    expect(moku.parent).toEqual(ken.id)
   })
 
   it('parses compound predicates', () => {
     const [toki, , pona, , wawa] = parse('toki li pona li wawa')
 
-    expect([pona, wawa].map(getRole)).toEqual(['predicate', 'predicate'])
+    expect([pona, wawa].map(getRole)).toEqual(['PREDICATE', 'PREDICATE'])
   })
 
   it('parses a subjectless optative predicate', () => {
     const [o, pona] = parse('o pona')
 
-    expect([o, pona].map(getRole)).toEqual([undefined, 'predicate'])
+    expect([o, pona].map(getRole)).toEqual([undefined, 'PREDICATE'])
   })
 
   it('parses a vocative expression in an indicative sentence', () => {
     const [jan, mute, o, ale, li, pona] = parse('jan mute o, ale li pona')
 
     expect(jan).toInclude({
-      role: 'vocative'
+      role: 'VOCATIVE'
     })
   })
 
@@ -207,7 +218,7 @@ describe('parser', () => {
     const [sewi, o] = parse('sewi o!')
 
     expect(sewi).toInclude({
-      role: 'vocative'
+      role: 'VOCATIVE'
     })
   })
 
@@ -215,14 +226,14 @@ describe('parser', () => {
     const [sewi, o] = parse('sewi o')
 
     expect(sewi).toInclude({
-      role: 'vocative'
+      role: 'VOCATIVE'
     })
   })
 
   it('parses questions with ala', () => {
     const [sina, pona1, ala, pona2] = parse('sina pona ala pona')
 
-    expect([ala, pona2].map(getRole)).toEqual(['interrogative', 'interrogative_repetition'])
+    expect([ala, pona2].map(getRole)).toEqual(['INTERROGATIVE', 'INTERROGATIVE_REPETITION'])
     expect(pona2).toInclude({ text: 'pona' })
   })
 
@@ -230,7 +241,7 @@ describe('parser', () => {
     const [ni, li, pona, ala, a] = parse('ni li pona ala a')
 
     expect(ala).toInclude({
-      role: 'negative',
+      role: 'NEGATIVE',
       head: pona.id
     })
   })
@@ -239,7 +250,7 @@ describe('parser', () => {
     const [ike, li, lon, ala] = parse('ike li lon ala')
 
     expect(ala).toInclude({
-      role: 'negative',
+      role: 'NEGATIVE',
       head: lon.id
     })
   })
@@ -247,19 +258,19 @@ describe('parser', () => {
   it('parses negated pre-verb', () => {
     const [ijo, li, ken, ala, awen] = parse('ijo li ken ala awen')
 
-    expect([ken, ala, awen].map(getRole)).toEqual(['predicate', 'negative', 'infinitive'])
+    expect([ken, ala, awen].map(getRole)).toEqual(['PREDICATE', 'NEGATIVE', 'INFINITIVE'])
   })
 
   it('parses anu phrase in subject', () => {
     const [kili, anu, pan, li, pona] = parse('kili anu pan li pona')
 
-    expect([kili, pan].map(getRole)).toEqual(['subject', 'subject'])
+    expect([kili, pan].map(getRole)).toEqual(['SUBJECT', 'SUBJECT'])
   })
 
   it('parses anu phrase in predicate', () => {
     const [moku, li, ko, anu, telo] = parse('moku li ko anu telo')
 
-    expect([ko, telo].map(getRole)).toEqual(['predicate', 'predicate'])
+    expect([ko, telo].map(getRole)).toEqual(['PREDICATE', 'PREDICATE'])
   })
 
   it('parses proper nouns', () => {
@@ -267,7 +278,7 @@ describe('parser', () => {
 
     expect(Sonja).toInclude({
       text: 'Sonja',
-      role: 'complement'
+      role: 'COMPLEMENT'
     })
   })
 
@@ -279,7 +290,7 @@ describe('parser', () => {
     const [toki, li, ijo, pi, pona, mute] = parse('toki li ijo pi pona mute')
 
     expect(pona).toInclude({
-      role: 'complement',
+      role: 'COMPLEMENT',
       head: ijo.id,
     })
   })

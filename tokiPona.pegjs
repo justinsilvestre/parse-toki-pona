@@ -4,7 +4,11 @@
   const flatten = (arrs) => arrs.reduce((a, b) => a.concat(b), [])
   const last = (arr) => arr[arr.length - 1]
   const init = (arr) => arr.slice(0, arr.length - 1)
-  const cast = (words, role) => words.map((w, i) => (i === 0 || words[i - 1].text === 'anu') ? m(w, { role }) : w)
+  const cast = (words, role, parent) => {
+    const newProps = { role }
+    if (parent) { newProps.parent = parent.id }
+    return words.map((w, i) => (i === 0 || words[i - 1].text === 'anu') ? m(w, newProps) : w)
+  }
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ text, id: v4()})
@@ -33,9 +37,9 @@
       ? m(w, { role: `CONTEXT_${w.role}` })
       : w
   })
-  const infinitive = (words) => cast(words, 'INFINITIVE')
+  const infinitive = (words, [parent]) => cast(words, 'INFINITIVE', parent)
   const directObject = (words) => cast(words, 'DIRECT_OBJECT')
-  const prepositionalObject = (words) => cast(words, 'PREPOSITIONAL_OBJECT')
+  const prepositionalObject = (words, [parent]) => cast(words, 'PREPOSITIONAL_OBJECT', parent)
   const negative = (ala) => ala ? [{ text: 'ala', role: 'NEGATIVE', id: v4() }] : []
   const interrogative = (s) => [{ text: 'ala', role: 'INTERROGATIVE', id: v4() }, { text: s.text, role: 'INTERROGATIVE_REPETITION', id: v4() }]
 
@@ -86,7 +90,7 @@ OptativeParticle
 Predicate
   = vp:VerbalPhrase dos:DirectObject+ {
     const tv = (vp[vp.findIndex(w => w.role === 'COMPLEMENT') - 1] || last(vp)).id;
-    return predicate([...vp, ...flatten(dos.map(([e, h, ...r]) => [e, m(h, { verb: tv }), ...r])) ])
+    return predicate([...vp, ...flatten(dos.map(([e, h, ...r]) => [e, m(h, { parent: tv }), ...r])) ])
   }
   / prep:PrepositionalPhrase { return predicate(prep) }
   / vp:VerbalPhrase { return predicate(vp) }
@@ -96,11 +100,11 @@ AdditionalPredicate
   = mp:ModalParticle p:Predicate { return [mp, ...p] }
 
 VerbalPhrase
-  = pv:PreVerbWithPolarity vp:VerbalPhrase { return [...pv, ...infinitive(vp)] }
+  = pv:PreVerbWithPolarity vp:VerbalPhrase { return [...pv, ...infinitive(vp, pv)] }
   / p:Phrase { return p }
 
 PrepositionalPhrase
-  = prep:PrepositionWithPolarity p:Phrase { return [...complement(prep), ...prepositionalObject(p)] }
+  = prep:PrepositionWithPolarity p:Phrase { return [...complement(prep), ...prepositionalObject(p, prep)] }
 
 EndPunctuation
   = [\.\?\!\:]+ { return text() }
