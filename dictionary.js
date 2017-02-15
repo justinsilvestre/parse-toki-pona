@@ -20,13 +20,15 @@ const csvToJSON = (csvData) => csvData.map((line) => {
   }
 
   const existingEntryData = hash[head] || {}
-  const existingTranslations = existingEntryData[tpPOS] || []
+  const existingTranslations = existingEntryData[tpPOS] || {}
 
   const newTranslations = translations.map((text) => ({ text, pos: enPOS }))
 
   return Object.assign({}, hash, {
     [head]: Object.assign({}, existingEntryData, {
-      [tpPOS]: [...existingTranslations, ...newTranslations]
+      [tpPOS]: Object.assign({}, existingTranslations, {
+        [enPOS]: (existingTranslations[enPOS] || []).concat(newTranslations)
+      }),
     }),
   })
 }, {})

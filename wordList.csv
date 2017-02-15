@@ -196,6 +196,8 @@ pan,i,n,cereal,grain,barley,corn,oat,rice,wheat,bread,pasta
 pana,i,vt,give,send,emit,provide,put,release
 pi,p,x,(signals nested modifiers)
 pi,i,xprep,of,about (topic of discussion),regarding (topic of discussion),concerning (topic of discussion),for (purpose)
+pilin,t,vt,feel,think,sense,touch
+pilin,i,vi,feel,think,sense
 pilin,i,n,feeling,heart,emotion,experience
 pilin,i,adj,feeling,emotion,experience
 pimeja,i,adj,black,dark,unlit
@@ -223,6 +225,7 @@ seli,t,vt,burn,cook,process
 seli,i,adj,hot,warm,cooked
 selo,i,n,outside (surface),outer form,outer layer,bark,peel,shell,skin,boundary,shape
 seme,i,pn,what,which
+seme,i,d,which
 sewi,i,n,area above,highest part,something elevated
 sewi,i,adj,awe-inspiring,divine,sacred,supernatural
 sijelo,i,n,body,physical state,torso
