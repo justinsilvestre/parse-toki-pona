@@ -163,7 +163,7 @@ CS "common substantive"
   /'pakala'/'palisa'/'namako'/'monsi'/'kiwen'/'utala'/'linja'/'pilin'
   /'akesi'/'tenpo'/'nanpa'/'nasin'/'alasa'/'musi'/'suli'/'kule'
   /'sike'/'suno'/'sewi'/'seme'/'selo'/'seli'/'insa'/'pona'/'poki'/'poka'
-  /'pipi'/'pini'/'supa'/'suwi'/'pana'/'wile'/'pali'/'taso'/'open'/'ante'
+  /'pipi'/'pini'/'supa'/'suwi'/'pana'/'pali'/'taso'/'open'/'ante'
   /'olin'/'kili'/'noka'/'nimi'/'waso'/'nena'/'nasa'/'telo'/'toki'/'mute'
   /'tomo'/'esun'/'kasi'/'moli'/'moku'/'mije'/'wawa'/'meli'/'mani'/'mama'
   /'kala'/'lupa'/'unpa'/'luka'/'anpa'/'loje'/'lipu'/'jelo'/'lili'/'lete'/'weka'
@@ -175,7 +175,7 @@ MS "microsubject"
   = _? x:('mi'/'sina') _ { return x }
 
 PV "pre-verb"
-  = _? x:('awen'/'kama'/'ken'/'lukin'/'sona') _ { return x }
+  = _? x:('awen'/'kama'/'ken'/'lukin'/'sona'/'wile') _ { return x }
 
 PREP "preposition"
   = _? x:('kepeken'/'lon'/'sama'/'tan'/'tawa') _ { return x }
