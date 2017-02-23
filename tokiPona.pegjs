@@ -12,7 +12,16 @@
 
   const isSubstantive = (val) => typeof val !== 'string'
   const word = (text) => ({ text, id: v4()})
-  const phrase = (first, alternate) => [...first, ...(alternate ? [word('anu'), ...alternate] : [])]
+  const markAlternate = ([alternateFirst, ...alternateRest]) => [word('anu'), m(alternateFirst, { anu: true }), ...alternateRest]
+  const phrase = (first, alternate) => {
+    return [
+      ...first,
+      ...(alternate
+        ? markAlternate(alternate)
+        : []
+      ),
+    ]
+  }
   const complements = (head) => (c) => m(c, { role: c.role || 'COMPLEMENT', head: c.head || head.id }) // test this works with anu
   const vocative = (words) => cast(words, 'VOCATIVE')
   const predicate = (words) => {

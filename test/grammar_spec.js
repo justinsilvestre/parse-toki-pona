@@ -267,6 +267,12 @@ describe('parser', () => {
     expect([kili, pan].map(getRole)).toEqual(['SUBJECT', 'SUBJECT'])
   })
 
+  it('marks word after anu', () => {
+    const [kili, anu, pan, li, pona] = parse('kili anu pan li pona')
+
+    expect(pan).toInclude({ anu: true })
+  })
+
   it('parses anu phrase in predicate', () => {
     const [moku, li, ko, anu, telo] = parse('moku li ko anu telo')
 
