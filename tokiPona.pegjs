@@ -98,7 +98,14 @@ OptativeParticle
 
 Predicate
   = vp:VerbalPhrase dos:DirectObject+ {
-    const tv = (vp[vp.findIndex(w => w.role === 'COMPLEMENT') - 1] || last(vp)).id;
+    let tv
+    for (let i = vp.length - 1;i >= 0;i--) {
+      if (!['COMPLEMENT', 'NEGATIVE', 'INTERROGATIVE', 'INTERROGATIVE_REPETITION'].includes(vp[i].role)) {
+        tv = vp[i].id
+        break
+      }
+    }
+
     return predicate([...vp, ...flatten(dos.map(([e, h, ...r]) => [e, m(h, { parent: tv }), ...r])) ])
   }
   / prep:PrepositionalPhrase { return predicate(prep) }

@@ -279,6 +279,12 @@ describe('parser', () => {
     expect([ko, telo].map(getRole)).toEqual(['PREDICATE', 'PREDICATE'])
   })
 
+  // it('parses anu phrase in direct object', () => {
+  //   const [soweli, li, moku, e, kili, anu, kasi] = parse('soweli li moku e kili anu kasi')
+  //
+  //   expect(getRole(kasi)).toEqual('DIRECT_OBJECT')
+  // })
+
   it('parses proper nouns', () => {
     const [jan, Sonja, li, mama, pi, toki, pona] = parse('jan Sonja li mama pi toki pona')
 
@@ -298,6 +304,14 @@ describe('parser', () => {
     expect(pona).toInclude({
       role: 'COMPLEMENT',
       head: ijo.id,
+    })
+  })
+
+  it('associates direct object with negated verb', () => {
+    const [mi, moku, ala, e, kili] = parse('mi moku ala e kili')
+
+    expect(kili).toInclude({
+      parent: moku.id,
     })
   })
 })
