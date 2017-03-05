@@ -117,6 +117,7 @@ AdditionalPredicate
 
 VerbalPhrase
   = pv:PreVerbWithPolarity vp:VerbalPhrase { return [...pv, ...infinitive(vp, pv)] }
+  / pp:PrepositionalPhrase !(DirectObject) { return pp }
   / p:Phrase { return p }
 
 PrepositionalPhrase

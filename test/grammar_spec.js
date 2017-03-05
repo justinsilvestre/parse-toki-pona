@@ -314,4 +314,10 @@ describe('parser', () => {
       parent: moku.id,
     })
   })
+
+  it('parse preverb with prepositional infinitive', () => {
+    const [mi, lukin, tawa, ma, ante]  = parse('mi lukin tawa ma ante')
+
+    expect(getRole(ma)).toEqual('PREPOSITIONAL_OBJECT')
+  })
 })
