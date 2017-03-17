@@ -5,7 +5,8 @@ akesi,i,n,creature,reptile,amphibian,non-cute animal,vermin
 akesi,i,adj,creepy,slimy,scaly
 ala,i,adj,no,not,zero
 ala,i,adv,not
-alasa,t,vt,forage for,hunt,harvest
+alasa,t,vt,hunt,harvest
+alasa,t,vp,forage (for)
 alasa,i,vi,forage,hunt,harvest
 alasa,i,n,hunt,wild game
 ale,i,adj,all,complete,abundant,whole,entire,countless,bountiful,plentiful
@@ -25,9 +26,9 @@ ante,t,vt,change,modify,alter
 ante,i,pn,another
 anu,prep,conj,or
 awen,i,adj,enduring,kept,protected,safe,permanent
-awen,i,vt,continue,keep on
-awen,i,vi,continue,endure,keep,wait,stay
-awen,prev,vt,continue,keep on
+awen,i,vi,continue,go on,endure,stay,remain,wait,keep
+awen,t,vt,prolong,continue
+awen,prev,vc,stay,remain,continue,keep on
 e,p,x,(before the direct object)
 e,i,xconj,and (between multiple direct objects)
 en,p,xconj,and (between multiple subjects)
@@ -45,7 +46,7 @@ jaki,i,adj,disgusting,dirty,obscene,sickly,toxic,unclean,unsanitary
 jaki,i,n,filth,garbage,dirt,pollution
 jaki,t,vt,soil,dirty,pollute
 jaki,i,int,ew,yuck
-jan,i,n,human being,person
+jan,i,n,person,human,human being
 jan,i,pn,somebody,someone,anybody,anyone
 jan,i,d,somebody's,someone's,anybody's,anyone's
 jan,t,vt,personify,humanize
@@ -54,18 +55,19 @@ jelo,i,adj,yellow,yellowish,light green
 jelo,i,n,yellow,light green
 jo,t,vt,have,carry,contain,hold
 jo,i,n,possession,ownership
-kala,i,n,fish,sea creature,marine amnimal
+kala,i,n,fish,sea creature,marine animal
 kala,i,adj,aquatic
 kalama,i,vi,produce a sound,ring,sound
 kalama,t,vt,recite,utter aloud,play (music)
 kalama,i,n,sound,noise,voice
 kama,i,adj,arriving,coming,future,summoned
 kama,i,vi,come,arrive,happen
-kama,t,vt,become,manage (to),succeed in,bring about,summon
+kama,t,vt,succeed in,bring about,summon
 kama,i,n,event,happening,chance,arrival,beginning
-kama,prev,vt,become,come (to),turn into
+kama,prev,vc,become,come (to)
+kama,prev,vp,turn (into)
 kasi,i,n,plant,herb,leaf,wood,vegetation
-ken,prev,vm,can,may,be able (to),be allowed (to)
+ken,prev,vm,can,may,be able,be allowed
 ken,i,adj,possible
 ken,i,adv,possibly
 ken,i,n,possibility,ability,power,permission
@@ -73,9 +75,9 @@ kepeken,t,vt,use,employ
 kepeken,prep,prep,with,by means of
 kepeken,i,n,use
 kili,i,n,fruit,vegetable,mushroom
-kiwen,i,n,rock,stone,hard object,metal,mineral
+kiwen,i,n,rock,stone,metal,mineral
 kiwen,i,adj,hard,solid
-ko,i,n,clay,dough,paste,powder,gum,clinging form,semi-solid,paste,powder
+ko,i,n,clay,dough,paste,powder,semi-solid,paste,powder
 ko,i,adj,squishy
 kon,i,n,air,breath,wind,smell,essence,spirit,hidden reality,unseen agent
 kon,i,adj,ethereal,gaseous
@@ -109,17 +111,19 @@ lili,i,adj,little,small,short,few,young
 lili,i,adv,a little,a bit,barely
 lili,t,vt,reduce,shorten,shrink,lessen
 linja,i,n,long and flexible thing,cord,hair,rope,thread,string,yarn,chain
-lipu,i,n,flat object,book,document,card,paper,record,website,ticket
+lipu,i,n,document,book,card,paper,record,website,ticket
+lipu,adj,flat
 loje,i,adj,red,reddish
-lon,prep,prep,(located) at,located at,present at
+lon,prep,prep,at
 lon,t,vt,bring out,realize
-lon,i,vi,exist,be (there)
-lon,i,adj,real,true,existent
+lon,i,vi,exist,be there
+lon,i,adj,real,true,present,existent
 luka,i,n,arm,hand,paw,tactile organ
 luka,i,num,five
 lukin,i,n,eye
 lukin,i,vi,look,see,examine,observe,read,watch,watch out,pay attention
-lukin,t,vt,look at,see,seek,look for,examine,read,watch,pay attention to,observe
+lukin,t,vt,see,seek,examine,read,watch,pay attention to,observe
+lukin,t,vp,look (for),look (at)
 lukin,prev,vt,try (to)
 lukin,i,adj,visual
 lukin,i,adv,visually
@@ -159,7 +163,7 @@ mute,i,dp,many,several,plenty
 mute,i,d,lots of,a lot of,more,much
 mute,i,pnp,many,several
 mute,i,pn,a lot,much
-mute,i,adv,much,very,really
+mute,i,adv,really,very,much
 mute,i,adj,abundant,multiple,many,plenty
 mute,t,vt,multiply,increase
 nanpa,i,n,number
@@ -186,6 +190,8 @@ ona,i,pns,it
 ona,i,adj,of his,of hers,of theirs
 ona,i,d,his,her,their,its
 open,t,vt,begin,start,open,turn on
+open,i,vi,begin,start
+open,i,adj,beginning,open,on
 pakala,i,adj,botched,broken,damaged,harmed,messed up
 pakala,t,vt,botch,break,damage,mess up
 pali,t,vt,do,take action on,work on,build,make,prepare,create
@@ -210,8 +216,9 @@ pipi,i,n,bug,insect,ant,spider
 poka,i,n,hip,side,nearby,vicinity
 poki,i,n,container,bag,bowl,box,cup,cupboard,drawer,vessel
 pona,i,adj,good,positive,useful,friendly,peaceful,simple
+pona,i,adv,well
 pona,i,n,good,simplicity,positivity,goodness
-pona,t,vt,improve,fix,repair,better
+pona,t,vt,improve,fix,clean,repair,better
 pona,i,int,yay,hooray,hurrah
 pu,i,pn,the official Toki Pona book
 pu,i,vi,read the official Toki Pona book,interact with the official Toki Pona book
@@ -220,15 +227,18 @@ sama,i,pno,each other,one another,the same
 sama,i,d,the same
 sama,i,n,sibling,peer,fellow
 sama,prep,prep,as,like,such as,similar to,the same as
-seli,i,n,fire,light,cooking element,chemical reaction,heat source
+sama,vp,seem (like)
+sama,vc,seem,appear,look
+seli,i,n,fire,light,heat,cooking element,chemical reaction
 seli,t,vt,burn,cook,process
 seli,i,adj,hot,warm,cooked
 selo,i,n,outside (surface),outer form,outer layer,bark,peel,shell,skin,boundary,shape
 seme,i,pn,what,which
 seme,i,d,which
-sewi,i,n,area above,highest part,something elevated
+seme,i,adv,how
+sewi,i,n,top,height,area above,highest part
 sewi,i,adj,awe-inspiring,divine,sacred,supernatural
-sijelo,i,n,body,physical state,torso
+sijelo,i,n,body,torso,physical state
 sike,i,n,round or circular thing,ball,circle,cycle,sphere,wheel
 sike,i,adj,of one year
 sin,i,adj,new,fresh,additional,another,extra
@@ -239,14 +249,18 @@ sina,i,d,your
 sina,i,adj,of yours
 sinpin,i,n,face,foremost,front,wall
 sitelen,i,n,image,picture,representation,symbol,mark,writing
-sona,t,vt,know,know how (to),be skilled in,be wise about,have information on
+sitelen,t,vt,write,draw
+sitelen,t,vi,write,draw
+sona,t,vt,know,know how,
+sona,t,vp,be skilled (in),be wise (about),have information (on)
 sona,i,n,knowledge,wisdom
+sona,i,vi,know
 soweli,i,n,animal,beast,land mammal
 suli,i,adj,big,heavy,large,great,long,tall,important,adult
 suli,t,vt,enlarge,lengthen
 suli,i,n,size
-suno,i,n,sun,light,brightness,glow,radiance,shine,light source
-suno,i,adj,daytime,daily
+suno,i,n,sun,light,day,brightness,glow,radiance,shine,light source
+suno,i,adj,bright,solar
 supa,i,n,(horizontal) surface,top,table,thing to put or rest something on
 suwi,i,adj,sweet,fragrant,cute,innocent,adorable
 suwi,i,n,candy,sweet food
@@ -256,17 +270,18 @@ tan,i,n,origin,cause
 taso,i,conj,but,however,except
 taso,i,adj,only,sole
 taso,i,adv,only,just
-tawa,prep,prep,to (direction),going to,toward,approaching,moving to,until,for (from the perspective of),to (from the perspective of)
-tawa,prep,vt,go to,move to,move towards,approach
+tawa,prep,prep,to (direction),toward,approaching,until,for (from the perspective of),to (from the perspective of)
+tawa,prep,vt,approach
+tawa,prep,vp,go (to), move (to), move (towards),
 tawa,t,vt,e,move,displace
 tawa,i,vi,go,leave,move,walk,travel
 tawa,i,adj,moving
 telo,i,n,water,liquid,fluid,beverage,juice,sauce,sea,bay,stream,body of water
 telo,i,adj,watery
-telo,t,vt,water,wash,rinse,wet
+telo,t,vt,wash,wet,rinse,water
 tenpo,i,n,time,duration,moment,occasion,period,situation
-toki,i,vi,communicate,say,speak,talk,use language,think
-toki,t,vt,say,speak
+toki,i,vi,communicate,say,speak,talk,think
+toki,t,vt,say,speak,utter
 toki,i,n,language,tongue,speech
 toki,i,int,hello,hi
 tomo,i,n,building,indoor space,home,house,room
@@ -275,7 +290,7 @@ tu,i,num,two
 tu,i,adj,double
 tu,i,dp,a pair of
 tu,i,n,pair
-unpa,t,vt,have sexual relations with,have marital relations with
+unpa,t,vp,have sexual relations (with),have marital relations (with)
 unpa,i,vi,have sex
 unpa,i,n,sex
 unpa,i,adj,sexual,erotic
@@ -291,6 +306,7 @@ waso,i,n,bird,flying creature,winged animal
 wawa,i,adj,strong,powerful,confident,sure,energetic,intense
 weka,i,adj,absent,away
 weka,t,vt,ignore,remove,shun,repel
-wile,prev,vm,must,should,have to,wish to
-wile,t,vt,need,require,want,wish for
+wile,t,vt,want,need,require,have (to),wish (to)
+wile,prev,vm,must,should
+wile,t,vp,wish (to)
 wile,i,n,"will (wish,desire)"
