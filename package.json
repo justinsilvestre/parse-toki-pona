@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register",
-    "build": "pegjs -o index.js tokiPona.pegjs"
+    "build": "pegjs -o index.js tokiPona.pegjs",
+    "dic": "node buildDictionary.js"
   },
   "author": "Justin Silvestre",
   "license": "CC-BY-NC-SA-4.0",
