@@ -1,0 +1,7 @@
+test
+.babelrc
+buildDictionary.js
+dictionary.js
+dictionaryEntries.js
+tokiPona.pegjs
+wordList.csv

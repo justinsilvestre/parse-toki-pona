@@ -1,5 +1,13 @@
-{ // get options for alternative searching
+{
   const { v4 } = require('uuid')
+  const {
+    VOCATIVE, PREDICATE, COMPLEMENT, SUBJECT, INFINITIVE,
+    DIRECT_OBJECT, PREPOSITIONAL_OBJECT, NEGATIVE, INTERROGATIVE,
+    INTERROGATIVE_REPETITION, VOCATIVE_PARTICLE, INDICATIVE_PARTICLE,
+    OPTATIVE_PARTICLE, DIRECT_OBJECT_PARTICLE,
+    COMPOUND_COMPLEMENT_PARTICLE, AND_PARTICLE, OR_PARTICLE,
+    CONTEXT_PARTICLE, CONTEXT_SUBJECT, CONTEXT_PREDICATE,
+  } = require('./roles')
   const m = (...objs) => Object.assign({}, ...objs)
   const flatten = (arrs) => arrs.reduce((a, b) => a.concat(b), [])
   const last = (arr) => arr[arr.length - 1]
@@ -22,15 +30,15 @@
       ),
     ]
   }
-  const complements = (head) => (c) => m(c, { role: c.role || 'COMPLEMENT', head: c.head || head.id }) // test this works with anu
-  const vocative = (words) => cast(words, 'VOCATIVE')
+  const complements = (head) => (c) => m(c, { role: c.role || COMPLEMENT, head: c.head || head.id }) // test this works with anu
+  const vocative = (words) => cast(words, VOCATIVE)
   const predicate = (words) => {
     const finalPPs = flatten(last(words).finalPPs || []).map(complements(words[0]))
-    return cast([...words, ...finalPPs], 'PREDICATE')
+    return cast([...words, ...finalPPs], PREDICATE)
   }
-  const complement = (words) => cast(words, 'COMPLEMENT')
-  const subject = (words) => cast(words, 'SUBJECT')
-  const endPunctuation = (text = '') => ({ role: 'END_PUNCTUATION', text })
+  const complement = (words) => cast(words, COMPLEMENT)
+  const subject = (words) => cast(words, SUBJECT)
+  const endPunctuation = (text = '') => ({ role: END_PUNCTUATION, text })
   const punctuate = ({ before, after }, word) => m(
     before ? { before } : {},
     after ? { after } : {},
@@ -42,17 +50,17 @@
     if (!w.role)
       return w
 
-    return (w.role === 'SUBJECT' || w.role === 'PREDICATE')
-      ? m(w, { role: `CONTEXT_${w.role}` })
+    return (w.role === SUBJECT || w.role === PREDICATE)
+      ? m(w, { role: w.role === SUBJECT ? CONTEXT_SUBJECT : CONTEXT_PREDICATE })
       : w
   })
-  const infinitive = (words, [parent]) => cast(words, 'INFINITIVE', parent)
-  const directObject = (words) => cast(words, 'DIRECT_OBJECT')
-  const prepositionalObject = (words, [parent]) => cast(words, 'PREPOSITIONAL_OBJECT', parent)
-  const negative = (ala) => ala ? [{ text: 'ala', role: 'NEGATIVE', id: v4() }] : []
-  const interrogative = (s) => [{ text: 'ala', role: 'INTERROGATIVE', id: v4() }, { text: s.text, role: 'INTERROGATIVE_REPETITION', id: v4() }]
+  const infinitive = (words, [parent]) => cast(words, INFINITIVE, parent)
+  const directObject = (words) => cast(words, DIRECT_OBJECT)
+  const prepositionalObject = (words, [parent]) => cast(words, PREPOSITIONAL_OBJECT, parent)
+  const negative = (ala) => ala ? [{ text: 'ala', role: NEGATIVE, id: v4() }] : []
+  const interrogative = (s) => [{ text: 'ala', role: INTERROGATIVE, id: v4() }, { text: s.text, role: INTERROGATIVE_REPETITION, id: v4() }]
 
-  const vocativeParticle = { text: 'o', role: 'VOCATIVE_PARTICLE', id: v4() }
+  const vocativeParticle = { text: 'o', role: VOCATIVE_PARTICLE, id: v4() }
 
   const tagWithFinalPPs = (words, finalPPs) => [...init(words), m(last(words), { finalPPs })]
 
@@ -66,7 +74,7 @@ Sentences
 
 Sentence
   = v:Vocative? cs:Context* c:Clause ep:EndPunctuation
-    { return [...(v || []), ...flatten(cs.map((c, i) => c.map((w) => (w.role || '').startsWith('CONTEXT') ? m(w, { context: i }) : w))), ...punctuateLast(ep, [...c])] }
+    { return [...(v || []), ...flatten(cs.map((c, i) => c.map((w) => [CONTEXT_PREDICATE, CONTEXT_SUBJECT].includes(w.role) ? m(w, { context: i }) : w))), ...punctuateLast(ep, [...c])] }
   / v:Vocative ep:EndPunctuation { return [...punctuateLast(ep, [...v])] }
 
 Vocative
@@ -100,7 +108,7 @@ Predicate
   = vp:VerbalPhrase dos:DirectObject+ {
     let tv
     for (let i = vp.length - 1;i >= 0;i--) {
-      if (!['COMPLEMENT', 'NEGATIVE', 'INTERROGATIVE', 'INTERROGATIVE_REPETITION'].includes(vp[i].role)) {
+      if (![COMPLEMENT, NEGATIVE, INTERROGATIVE, INTERROGATIVE_REPETITION].includes(vp[i].role)) {
         tv = vp[i].id
         break
       }
