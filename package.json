@@ -1,6 +1,6 @@
 {
   "name": "parse-toki-pona",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Parse Toki Pona sentences",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "author": "Justin Silvestre",
   "license": "CC-BY-NC-SA-4.0",
   "dependencies": {
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "csv-parse": "^1.1.7",
